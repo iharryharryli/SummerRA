@@ -1,0 +1,525 @@
+public void playMainGameClick(GImageButton source, GEvent event) {
+  println("startMainGame - GImageButton >> GEvent." + event + " @ " + millis());
+  gs = GameState.MAIN_GAME;
+  ms = MainGameState.PLACING_TOWERS;
+  playMainGame.setVisible(false);
+  testMyTowerButton.setVisible(false);
+  playMainGameProj.setVisible(false);
+  testMyTowerProj.setVisible(false);
+  
+} 
+
+public void testMyTowerClick(GImageButton source, GEvent event) { 
+  println("imgButton1 - GImageButton >> GEvent." + event + " @ " + millis());
+  gs = GameState.TEST_MY_TOWER;
+  ts = TestMyTowerState.PLACING_TOWER;
+  
+} 
+
+public void continueClick(GImageButton source, GEvent event) { 
+  println("continueButton - GImageButton >> GEvent." + event + " @ " + millis());
+  
+   if(gs == GameState.MAIN_GAME)
+    {
+      if(ms == MainGameState.PLACING_TOWERS)
+      {
+        println("set state");
+        ms = MainGameState.FALL_PREDICTION;
+      }
+      else if(ms == MainGameState.REASON)
+      {
+        ms = MainGameState.RESET;
+      }
+    }
+    else if(gs == GameState.TEST_MY_TOWER)
+    {
+       if(tmtStood)
+       {
+         ts = TestMyTowerState.CHALLENGE;
+          shakeButton.setVisible(true);
+         shakeButtonProj.setVisible(true);
+       }
+       else
+       {
+         ts = TestMyTowerState.PLACING_TOWER;
+       }
+    }
+    
+    continueButton.setVisible(false);
+    continueButtonProj.setVisible(false);
+  
+} 
+
+public void shakeClick(GImageButton source, GEvent event) {
+  println("shake - GImageButton >> GEvent." + event + " @ " + millis());
+  switch(gs)
+  {
+    case MAIN_GAME:
+      String[] t = new String[]{currentScenario.tower1,currentScenario.tower2};
+      if(!(towers.contains(t[0]) && towers.contains(t[1])))
+      {
+       ms = MainGameState.PLACING_TOWERS; 
+       //  predictTower1.setVisible(false);
+       //  predictTower2.setVisible(false);
+       //  predictSame.setVisible(false);
+       shakeButton.setVisible(false);
+       shakeButtonProj.setVisible(false);
+       return;
+      } 
+       shakingTimeout = System.currentTimeMillis() + 5000;
+      shakeButton.setVisible(false);
+      shakeButtonProj.setVisible(false);
+      ms = MainGameState.SHAKING;
+      
+      float centXL = bd.getBoxCentX(towerIndex.get(0));
+      float centXR = bd.getBoxCentX(towerIndex.get(1));
+      int leftInd;
+      int rightInd;
+      if(centXL < centXR)
+      {
+         leftInd = 0;
+         rightInd = 1;
+      }
+      else
+      {
+        leftInd = 1;
+        rightInd = 0;
+      }
+      
+      leftHeight = bd.getBlobHeight(towerIndex.get(0));
+      rightHeight = bd.getBlobHeight(towerIndex.get(1));
+      relayOn();
+      break;
+    case TEST_MY_TOWER:
+      oldShape = projContours.get(0).getPolygonApproximation().getPoints();
+      if(ts == TestMyTowerState.PLACING_TOWER)
+      {
+        if(towers.size() != 1)
+          return;
+        leftHeight = bd.getBlobHeight(towerIndex.get(0));
+        shakingTimeout = System.currentTimeMillis() + 5000;
+        startTime = System.currentTimeMillis();
+        ts = TestMyTowerState.SHAKING;
+        shakeButton.setVisible(false);
+        shakeButtonProj.setVisible(false);
+        relayOn();
+      }
+      else if(ts == TestMyTowerState.CHALLENGE)
+      {
+        if(bd.getBlobHeight(towerIndex.get(0)) < 100)
+        {
+          return;
+        }
+        leftHeight = bd.getBlobHeight(towerIndex.get(0));
+        shakingTimeout = System.currentTimeMillis() + 5000;
+        startTime = System.currentTimeMillis();
+        ts = TestMyTowerState.SHAKING;
+        shakeButton.setVisible(false);
+        shakeButtonProj.setVisible(false);
+        relayOn();
+          
+      }
+      break;
+}
+  
+}
+
+public void predictTower1Click(GImageButton source, GEvent event) { 
+  println("predictTower1 - GImageButton >> GEvent." + event + " @ " + millis());
+  
+  guessed = true; 
+  guess = "left"; 
+  
+} 
+
+public void predictTower2Click(GImageButton source, GEvent event) { 
+  
+  guessed = true; 
+  guess = "right";
+  
+} //_CODE_:predictTower2:839609:
+
+public void predictSameClick(GImageButton source, GEvent event) { 
+  println("predictSame - GImageButton >> GEvent." + event + " @ " + millis());
+  
+  guessed = true; 
+  guess = "same";
+  
+}
+
+public void predictionTallerClick(GImageButton source, GEvent event) { 
+  println("predictionTaller - GImageButton >> GEvent." + event + " @ " + millis());
+  
+  guessedReason = "taller";
+  ms = MainGameState.REASON;  
+} 
+
+public void predictionThinnerClick(GImageButton source, GEvent event) { 
+  println("predictionThinner - GImageButton >> GEvent." + event + " @ " + millis());
+  
+  guessedReason = "thinner";
+  ms = MainGameState.REASON; 
+} 
+
+public void predictionWeightClick(GImageButton source, GEvent event) { 
+  println("predictionWeight - GImageButton >> GEvent." + event + " @ " + millis());
+  
+  guessedReason = "weight";
+  ms = MainGameState.REASON;
+}
+
+public void predictionSymmClick(GImageButton source, GEvent event) { 
+  println("predictionSymm - GImageButton >> GEvent." + event + " @ " + millis());
+  
+  guessedReason = "symmetry";
+  ms = MainGameState.REASON; 
+}
+
+synchronized public void win_draw1(GWinApplet appc, GWinData data) { 
+  
+  switch(gs)
+  {
+    case MAIN_MENU:
+      drawMainMenuProj(appc);
+      break;
+    case MAIN_GAME:
+      drawMainGameProj(appc);
+      break;
+    case TEST_MY_TOWER:
+      drawTestMyTower(appc);
+      break;
+    case COMPETE:
+      break;
+  }
+  //playMainGameProj.setVisible(false);
+} 
+
+/*synchronized public void win_Mouse1(GWinApplet appc, GWinData data, MouseEvent e) {
+  println("clicked proj");
+}*/
+
+public void playMainGameProjClick(GImageButton source, GEvent event) { 
+  println("imgButton1 - GImageButton >> GEvent." + event + " @ " + millis());
+  
+  gs = GameState.MAIN_GAME;
+  ms = MainGameState.PLACING_TOWERS;
+  playMainGame.setVisible(false);
+  testMyTowerButton.setVisible(false);
+  playMainGameProj.setVisible(false);
+  testMyTowerProj.setVisible(false);
+  
+}
+
+public void testMyTowerProjClick(GImageButton source, GEvent event) { 
+  println("imgButton2 - GImageButton >> GEvent." + event + " @ " + millis());
+  
+  gs = GameState.TEST_MY_TOWER;
+  ts = TestMyTowerState.PLACING_TOWER;
+  
+} //_CODE_:testMyTowerProj:271733:
+
+public void continueButtonProjClick(GImageButton source, GEvent event) { 
+  println("continueButtonProj - GImageButton >> GEvent." + event + " @ " + millis());
+    if(gs == GameState.MAIN_GAME)
+    {
+      if(ms == MainGameState.PLACING_TOWERS)
+      {
+        println("set state");
+        ms = MainGameState.FALL_PREDICTION;
+      }
+      else if(ms == MainGameState.REASON)
+      {
+        ms = MainGameState.RESET;
+      }
+    }
+    else if(gs == GameState.TEST_MY_TOWER)
+    {
+       if(tmtStood)
+       {
+         ts = TestMyTowerState.CHALLENGE;
+          shakeButton.setVisible(true);
+       shakeButtonProj.setVisible(true);
+       }
+       else
+       {
+         ts = TestMyTowerState.PLACING_TOWER;
+       }
+    }
+    continueButton.setVisible(false);
+    continueButtonProj.setVisible(false);
+    
+  
+} 
+
+public void shakeButtonProjClick(GImageButton source, GEvent event) {
+  println("shakeButtonProj - GImageButton >> GEvent." + event + " @ " + millis());
+  switch(gs)
+  {
+    case MAIN_GAME:
+      String[] t = new String[]{currentScenario.tower1,currentScenario.tower2};
+      if(!(towers.contains(t[0]) && towers.contains(t[1])))
+      {
+       ms = MainGameState.PLACING_TOWERS; 
+       //  predictTower1.setVisible(false);
+       //  predictTower2.setVisible(false);
+       //  predictSame.setVisible(false);
+       shakeButton.setVisible(false);
+       shakeButtonProj.setVisible(false);
+       return;
+      } 
+       shakingTimeout = System.currentTimeMillis() + 5000;
+      shakeButton.setVisible(false);
+      shakeButtonProj.setVisible(false);
+      ms = MainGameState.SHAKING;
+      
+      float centXL = bd.getBoxCentX(towerIndex.get(0));
+      float centXR = bd.getBoxCentX(towerIndex.get(1));
+      int leftInd;
+      int rightInd;
+      if(centXL < centXR)
+      {
+         leftInd = 0;
+         rightInd = 1;
+      }
+      else
+      {
+        leftInd = 1;
+        rightInd = 0;
+      }
+      
+      leftHeight = bd.getBlobHeight(towerIndex.get(0));
+      rightHeight = bd.getBlobHeight(towerIndex.get(1));
+      relayOn();
+      break;
+    case TEST_MY_TOWER:
+      oldShape = projContours.get(0).getPolygonApproximation().getPoints();
+      if(ts == TestMyTowerState.PLACING_TOWER)
+      {
+        if(towers.size() != 1)
+          return;
+        leftHeight = bd.getBlobHeight(towerIndex.get(0));
+        shakingTimeout = System.currentTimeMillis() + 5000;
+        startTime = System.currentTimeMillis();
+        ts = TestMyTowerState.SHAKING;
+        shakeButton.setVisible(false);
+        shakeButtonProj.setVisible(false);
+        relayOn();
+      }
+      else if(ts == TestMyTowerState.CHALLENGE)
+      {
+        if(bd.getBlobHeight(towerIndex.get(0)) < 100)
+        {
+          return;
+        }
+        leftHeight = bd.getBlobHeight(towerIndex.get(0));
+        shakingTimeout = System.currentTimeMillis() + 5000;
+        startTime = System.currentTimeMillis();
+        ts = TestMyTowerState.SHAKING;
+        shakeButton.setVisible(false);
+        shakeButtonProj.setVisible(false);
+        relayOn();
+          
+      }
+      break;
+}
+} 
+
+public void predictTower1ProjClick(GImageButton source, GEvent event) { 
+  println("imgButton1 - GImageButton >> GEvent." + event + " @ " + millis());
+  guessed = true; 
+  guess = "left";
+} 
+
+public void predictSameProjClick(GImageButton source, GEvent event) {
+  println("imgButton1 - GImageButton >> GEvent." + event + " @ " + millis());
+  guessed = true; 
+  guess = "same";
+}
+
+public void predictTower2ProjClick(GImageButton source, GEvent event) { 
+  println("predictTower2Proj - GImageButton >> GEvent." + event + " @ " + millis());
+  guessed = true; 
+  guess = "right";
+} 
+
+public void predictionSymmProjClick(GImageButton source, GEvent event) { 
+  println("predictionSymmProj - GImageButton >> GEvent." + event + " @ " + millis());
+  guessedReason = "symmetry";
+  ms = MainGameState.REASON; 
+} 
+
+public void predictionWeightProjClick(GImageButton source, GEvent event) { 
+  println("predictionWeightProj - GImageButton >> GEvent." + event + " @ " + millis());
+  guessedReason = "weight";
+  ms = MainGameState.REASON; 
+} 
+
+public void predictionTallerProjClick(GImageButton source, GEvent event) { 
+  println("predictionTallerProj - GImageButton >> GEvent." + event + " @ " + millis());
+  guessedReason = "taller";
+  ms = MainGameState.REASON; 
+} 
+
+public void predictionThinnerProjClick(GImageButton source, GEvent event) { 
+  println("predictionThinnerProj - GImageButton >> GEvent." + event + " @ " + millis());
+  guessedReason = "thinner";
+  ms = MainGameState.REASON; 
+} 
+
+public void backButtonClick(GImageButton source, GEvent event) { 
+  println("clicked one of the back buttons");
+  switch(gs)
+  {
+    case MAIN_MENU:
+      break;
+    case MAIN_GAME:
+      switch(ms)
+      {
+        case PLACING_TOWERS:
+          gs = GameState.MAIN_MENU;
+          break;
+        case FALL_PREDICTION:
+          predictTower1Proj.setVisible(false);
+          predictTower2Proj.setVisible(false);
+          predictSameProj.setVisible(false);
+          predictTower1.setVisible(false);
+          predictTower2.setVisible(false);
+          predictSame.setVisible(false);
+          shakeButton.setVisible(false);
+          shakeButtonProj.setVisible(false);
+          ms = MainGameState.PLACING_TOWERS;
+          break;
+        case SHAKING: 
+          break;
+        case REASON_PREDICTION:
+          ms = MainGameState.PLACING_TOWERS;
+          break;
+        case REASON:
+          ms = MainGameState.REASON_PREDICTION;
+          continueButton.setVisible(false);
+          continueButtonProj.setVisible(false);
+          towerLeftImg = null;
+          towerRightImg = null;
+          circleImg = null;
+          break;
+        case RESET:
+          ms = MainGameState.REASON;
+          arrowsImg = null;
+          break;
+      }
+      break;
+    case TEST_MY_TOWER:
+      switch(ts)
+      {
+        case PLACING_TOWER: 
+          gs = GameState.MAIN_MENU;
+          break;
+        case SHAKING:
+          break;
+        case RESULT:
+          ts = TestMyTowerState.PLACING_TOWER;
+          break;
+        case RESET:
+          ts = TestMyTowerState.RESULT;
+          break;
+        case CHALLENGE:
+          ts = TestMyTowerState.PLACING_TOWER;
+          break;
+      }
+      break;
+  }
+} 
+
+
+// Create all the GUI controls. 
+// autogenerated do not edit
+public void createGUI(){
+  G4P.messagesEnabled(false);
+  G4P.setGlobalColorScheme(GCScheme.BLUE_SCHEME);
+  G4P.setCursor(ARROW);
+  if(frame != null)
+    frame.setTitle("Sketch Window");
+  playMainGame = new GImageButton(this, 570, 300, 380, 78, new String[] { "Assets/buttons/playgame1.png", "Assets/buttons/playgame1.png", "Assets/buttons/playgame1.png" } );
+  playMainGame.addEventHandler(this, "playMainGameClick");
+  testMyTowerButton = new GImageButton(this, 568, 404, 380, 78, new String[] { "Assets/buttons/playgame2.png", "Assets/buttons/playgame2.png", "Assets/buttons/playgame2.png" } );
+  testMyTowerButton.addEventHandler(this, "testMyTowerClick");
+  continueButton = new GImageButton(this, 540, 480, 322, 80, new String[] { "Assets/buttons/continue.png", "Assets/buttons/continue.png", "Assets/buttons/continue.png" } );
+  continueButton.addEventHandler(this, "continueClick");
+  shakeButton = new GImageButton(this, 450, 500, new String[] { "Assets/buttons/shake.png", "Assets/buttons/shake.png", "Assets/buttons/shake.png" } );
+  shakeButton.addEventHandler(this, "shakeClick");
+  predictTower1 = new GImageButton(this, 480, 160, 115, 161, new String[] { "Assets/buttons/first.png", "Assets/buttons/first.png", "Assets/buttons/first.png" } );
+  predictTower1.addEventHandler(this, "predictTower1Click");
+  predictTower2 = new GImageButton(this, 740, 160, 115, 161, new String[] { "Assets/buttons/second.png", "Assets/buttons/second.png", "Assets/buttons/second.png" } );
+  predictTower2.addEventHandler(this, "predictTower2Click");
+  predictSame = new GImageButton(this, 612, 160, 115, 161, new String[] { "Assets/buttons/same.png", "Assets/buttons/same.png", "Assets/buttons/same.png" } );
+  predictSame.addEventHandler(this, "predictSameClick");
+  predictionTaller = new GImageButton(this, 10, 175, 240, 120, new String[] { "Assets/buttons/pred_taller.png", "Assets/buttons/pred_taller.png", "Assets/buttons/pred_taller.png" } );
+  predictionTaller.addEventHandler(this, "predictionTallerClick");
+  predictionThinner = new GImageButton(this, 260, 175, 240, 120, new String[] { "Assets/buttons/pred_thinner.png", "Assets/buttons/pred_thinner.png", "Assets/buttons/pred_thinner.png" } );
+  predictionThinner.addEventHandler(this, "predictionThinnerClick");
+  predictionWeight = new GImageButton(this, 510, 175, 240, 120, new String[] { "Assets/buttons/pred_weight.png", "Assets/buttons/pred_weight.png", "Assets/buttons/pred_weight.png" } );
+  predictionWeight.addEventHandler(this, "predictionWeightClick");
+  predictionSymm = new GImageButton(this, 760, 175, 240, 120, new String[] { "Assets/buttons/pred_symm.png", "Assets/buttons/pred_symm.png", "Assets/buttons/pred_symm.png" } );
+  predictionSymm.addEventHandler(this, "predictionSymmClick");
+  window1 = new GWindow(this, "EarthShake", 0, 0, 1366, 768, true, JAVA2D);
+  window1.setActionOnClose(G4P.EXIT_APP);
+  window1.addDrawHandler(this, "win_draw1");
+  playMainGameProj = new GImageButton(window1.papplet, 790, 360, 440, 100, new String[] { "Assets2/buttons/playgame1.png", "Assets2/buttons/playgame1.png", "Assets2/buttons/playgame1.png" } );
+  playMainGameProj.addEventHandler(this, "playMainGameProjClick");
+  testMyTowerProj = new GImageButton(window1.papplet, 800, 500, 420, 100, new String[] { "Assets2/buttons/playgame2.png", "Assets2/buttons/playgame2.png", "Assets2/buttons/playgame2.png" } );
+  testMyTowerProj.addEventHandler(this, "testMyTowerProjClick");
+  continueButtonProj = new GImageButton(window1.papplet, 747, 610, 377, 91, new String[] { "Assets2/buttons/continue.png", "Assets2/buttons/continue_hover.png", "Assets2/buttons/continue_hover.png" } );
+  continueButtonProj.addEventHandler(this, "continueButtonProjClick");
+  shakeButtonProj = new GImageButton(window1.papplet, 625, 630, 264, 89, new String[] { "Assets2/buttons/shake.png", "Assets2/buttons/shake.png", "Assets2/buttons/shake.png" } );
+  shakeButtonProj.addEventHandler(this, "shakeButtonProjClick");
+  predictTower1Proj = new GImageButton(window1.papplet, 650, 212, 144, 201, new String[] { "Assets2/buttons/first.png", "Assets2/buttons/first.png", "Assets2/buttons/first.png" } );
+  predictTower1Proj.addEventHandler(this, "predictTower1ProjClick");
+  predictSameProj = new GImageButton(window1.papplet, 825, 214, 144, 201, new String[] { "Assets2/buttons/same.png", "Assets2/buttons/same.png", "Assets2/buttons/same.png" } );
+  predictSameProj.addEventHandler(this, "predictSameProjClick");
+  predictTower2Proj = new GImageButton(window1.papplet, 1000, 212, 144, 201, new String[] { "Assets2/buttons/second.png", "Assets2/buttons/second.png", "Assets2/buttons/second.png" } );
+  predictTower2Proj.addEventHandler(this, "predictTower2ProjClick");
+  predictionSymmProj = new GImageButton(window1.papplet, 1015, 310, 307, 105, new String[] { "Assets2/buttons/pred_symm.png", "Assets2/buttons/pred_symm.png", "Assets2/buttons/pred_symm.png" } );
+  predictionSymmProj.addEventHandler(this, "predictionSymmProjClick");
+  predictionWeightProj = new GImageButton(window1.papplet, 631, 310, 307, 105, new String[] { "Assets2/buttons/pred_weight.png", "Assets2/buttons/pred_weight.png", "Assets2/buttons/pred_weight.png" } );
+  predictionWeightProj.addEventHandler(this, "predictionWeightProjClick");
+  predictionTallerProj = new GImageButton(window1.papplet, 633, 190, 307, 105, new String[] { "Assets2/buttons/pred_taller.png", "Assets2/buttons/pred_taller.png", "Assets2/buttons/pred_taller.png" } );
+  predictionTallerProj.addEventHandler(this, "predictionTallerProjClick");
+  predictionThinnerProj = new GImageButton(window1.papplet, 1015, 190, 307, 105, new String[] { "Assets2/buttons/pred_thinner.png", "Assets2/buttons/pred_thinner.png", "Assets2/buttons/pred_thinner.png" } );
+  predictionThinnerProj.addEventHandler(this, "predictionThinnerProjClick");
+  
+  GImageButton backButton = new GImageButton(this, 5, 5, 92, 62, new String[] { "Assets/buttons/exit.png", "Assets/buttons/exit.png", "Assets/buttons/exit.png" } );
+  backButton.addEventHandler(this, "backButtonClick");
+  GImageButton backButtonProj = new GImageButton(window1.papplet, 5, 5, 92, 62, new String[] { "Assets2/buttons/exit.png", "Assets2/buttons/exit.png", "Assets2/buttons/exit.png" } );
+  backButtonProj.addEventHandler(this, "backButtonClick");
+  
+  //window1.addMouseHandler(this, "win_mouse1");
+}
+
+// Variable declarations 
+// autogenerated do not edit
+GImageButton playMainGame; 
+GImageButton testMyTowerButton; 
+GImageButton continueButton; 
+GImageButton shakeButton; 
+GImageButton predictTower1; 
+GImageButton predictTower2; 
+GImageButton predictSame; 
+GImageButton predictionTaller; 
+GImageButton predictionThinner; 
+GImageButton predictionWeight; 
+GImageButton predictionSymm; 
+GWindow window1;
+GImageButton playMainGameProj; 
+GImageButton testMyTowerProj; 
+GImageButton continueButtonProj; 
+GImageButton shakeButtonProj; 
+GImageButton predictTower1Proj; 
+GImageButton predictSameProj; 
+GImageButton predictTower2Proj; 
+GImageButton predictionSymmProj; 
+GImageButton predictionWeightProj; 
+GImageButton predictionTallerProj; 
+GImageButton predictionThinnerProj; 
+
+GImageButton backButton;
+GImageButton backButtonProj;
