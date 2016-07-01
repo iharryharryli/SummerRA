@@ -50,7 +50,7 @@ public int touchscreenHeight = 600;
 
 // These Values need to be calibrated by Young Wook for making sure that the towers are placed at the patch of the Blocks
 int kinectCenter = 301; 
-int leftTowerLeft = 190;
+int leftTowerLeft = 191;
 int leftTowerRight = 271;
 int rightTowerLeft = 340;
 int rightTowerRight = 415;
