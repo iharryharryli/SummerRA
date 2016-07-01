@@ -6,7 +6,7 @@ public class HarryGlobalClass{
   
   public float standardRulerHeight = -1;
   
-  public int groundThreshold = 350;
+  public int groundThreshold = 355;
   
   public int minimumBlobSize = 1000;
   
