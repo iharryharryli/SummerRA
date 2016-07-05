@@ -95,7 +95,7 @@ class ChallengeLogic{
   
   private long startCheckingTimeout;
  
-  int realTowerNum;
+  
   
   int trials;
   
@@ -116,7 +116,6 @@ class ChallengeLogic{
    control = new ChallengeControl(this);
    
    towerOK = false;
-   realTowerNum = -1;
    shakedTimeText = "";
    trials = 0;
    challengeReceived = 0;
@@ -127,7 +126,6 @@ class ChallengeLogic{
   void switchIn(){
     cs = ChallengeMyTowerState.RESET;
     towerOK = false;
-     realTowerNum = -1;
      shakedTimeText = "";
      trials = 0;
      challengeReceived = 0;
@@ -142,15 +140,15 @@ class ChallengeLogic{
   
   
  private boolean assureValid(){
-   if(realTowerNum == 1 && rulerEngine.tallEnough)return true;
+   if(towers.size() == 1 && rulerEngine.tallEnough)return true;
    else return false;
  }
  
  private void towerChecking(){
    if(System.currentTimeMillis() < startCheckingTimeout)return;
-   if(realTowerNum <= 1)
+   if(towers.size() <= 1)
       {
-        if(realTowerNum == 0)
+        if(towers.size() == 0)
         {
           // This is for the case where no block is placed on table
           
@@ -176,7 +174,7 @@ class ChallengeLogic{
  }
  
  private void resultCommon(){
-   if(realTowerNum == 0)control.continueBtnClick();
+   if(towers.size() == 0)control.continueBtnClick();
  }
    
  void play(){

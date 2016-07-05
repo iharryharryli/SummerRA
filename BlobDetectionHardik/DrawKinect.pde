@@ -118,7 +118,7 @@ public class challengeColor implements ColorBlob{
            stats.realTCount ++;
            stats.update(localleft,localright,localhighY,locallowY);
         }
-                  if(logic.towerOK || logic.realTowerNum == 0){
+                  if(logic.towerOK || towers.size() == 0){
                       res.fill(140, 255, 140);   
                       res.stroke(0, 200, 0);
                   }
@@ -175,7 +175,6 @@ public class KinectForChallenge implements KinectDrawDelegate{
   
   void analyze(){
     if(HarryGlobal.canRegisterHeight)HarryGlobal.towerHeightInPixel = stats.bottom - stats.top;
-    logic.realTowerNum = stats.realTCount;
     KinectDisplaySetting setting = HarryGlobal.KinectForTablet;
     logic.rulerEngine.measureTower(setting.scaleY*stats.top+setting.offsetY);
     if(logic.cs != ChallengeMyTowerState.SHAKING && logic.cs != ChallengeMyTowerState.FAIL && logic.cs != ChallengeMyTowerState.SUCCESS)

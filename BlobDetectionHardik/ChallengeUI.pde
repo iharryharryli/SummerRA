@@ -102,7 +102,7 @@ class ChallengeUI{
     
     
     textengine.drawText(screenID);
-    if(logic.cs == ChallengeMyTowerState.PLACING_TOWER && logic.realTowerNum == 0)uiengine.drawConstants(screenID,new int[]{24});
+    if(logic.cs == ChallengeMyTowerState.PLACING_TOWER && towers.size() == 0)uiengine.drawConstants(screenID,new int[]{24});
     
     if(logic.cs != ChallengeMyTowerState.RESET){
         drawKinectTowers(screenID);
