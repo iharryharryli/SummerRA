@@ -76,7 +76,7 @@ class ChallengeUI{
       if(screenID==1)uiengine.drawConstants(screenID,new int[]{0});
       uiengine.drawConstants(screenID,new int[]{23});
     }
-    else if(logic.cs == ChallengeMyTowerState.PLACING_TOWER || logic.cs == ChallengeMyTowerState.ENOUGH || logic.cs == ChallengeMyTowerState.ENOUGH_DELAY){
+    else if(logic.cs == ChallengeMyTowerState.PLACING_TOWER || logic.cs == ChallengeMyTowerState.ENOUGH ){
       if(screenID==1)uiengine.drawConstants(screenID,new int[]{0});
     }
     else if(logic.cs == ChallengeMyTowerState.TOO_SHORT || logic.cs == ChallengeMyTowerState.TOO_MANY_FIRST){

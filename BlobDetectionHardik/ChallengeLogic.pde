@@ -91,7 +91,6 @@ class ChallengeLogic{
   
   boolean towerOK;
   
-  private long handsOffTime;
   
   private long startCheckingTimeout;
  
@@ -189,25 +188,16 @@ class ChallengeLogic{
       break;
       
       case TOO_MANY_FIRST:
-      textengine.changeText(28);
+      //textengine.changeText(28);
       towerChecking();
       indicateTowerState(rulerEngine,-1);
       break;
       
       
       
+     
+      
       case ENOUGH:
-      
-      //textengine.changeText(40);
-      
-      handsOffTime = System.currentTimeMillis();
-      cs = ChallengeMyTowerState.ENOUGH_DELAY;
-     // indicateTowerState(rulerEngine,0);
-      
-      
-      break;
-      
-      case ENOUGH_DELAY:
       
       HarryGlobal.canRegisterHeight = true;
       
@@ -215,12 +205,12 @@ class ChallengeLogic{
       long currentT = System.currentTimeMillis();
       
       if(assureValid()){
-        if(currentT - handsOffTime > -1300){
+        
           indicateTowerState(rulerEngine,1);
           uiengine.turnBtn(new int[]{4},true);
-          if(noRuler) textengine.changeText(31);
-          else textengine.changeText(36);
-        }
+//          if(noRuler) textengine.changeText(31);
+//          else textengine.changeText(36);
+        
       }
       else{
         
@@ -233,7 +223,7 @@ class ChallengeLogic{
       break;
       
       case TOO_SHORT:
-      if(!noRuler)textengine.changeText(35);
+      //if(!noRuler)textengine.changeText(35);
       indicateTowerState(rulerEngine,2);
       towerChecking();
       
