@@ -292,7 +292,7 @@ class UIEngine{
   
    void switchOn(int[] ons){
      
-    sort(ons);
+    Arrays.sort(ons);
     Set set = searchUp.entrySet();
     Iterator i = set.iterator();
     while(i.hasNext()){

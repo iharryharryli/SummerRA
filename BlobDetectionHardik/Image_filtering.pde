@@ -20,15 +20,15 @@ void Image_filtering()
    opencv.gray();
    opencv.threshold(70); 
    srcImage = Image; 
-   if(kinectDrawDelegate == null){
-     pgKinectTablet = createKinectGraph();
-     pgKinectProjector = createKinectGraphProjector();
-   }
-   else if(gs == GameState.CHALLENGE){
-     KinectArtistForChallenge temp = (KinectArtistForChallenge)kinectDrawDelegate;
-     pgKinectTablet = temp.drawTablet();
-     pgKinectProjector = temp.drawProjector();
-   }
+   debugScreen.setImg(srcImage);
+ 
+   
+   HarryGlobal.kinectDrawer.updateCountours();
+   
+   
+   HarryGlobal.kinectDrawDelegate.tablet();
+   HarryGlobal.kinectDrawDelegate.projector();
+   
   
 }
 
@@ -37,6 +37,9 @@ void CleanKinectData()
   // 
   int leftThreshold = 80;
   int rightThreshold = 550;
+//  int topThreshold = 145;
+  int topThreshold = -1;
+  
   int depthMin = 600; // This figure defines the mininum depth at which the kinect should look for objects. 
   //i.e this value will change if the table if moved w.r.t to the Kinect mounting position
   int depthMax = 1000;// This figure defines the max depth after which the kinect doesn't see anything.
@@ -44,29 +47,54 @@ void CleanKinectData()
   int[] inputDepthMap = context.depthMap();
   context.depthImage().loadPixels();
   
+  int depthMapSize = context.depthMapSize();
+  int depthImgWidth = context.depthWidth();
+  int depthImgHeight = depthMapSize / depthImgWidth;
+  
   //Remove erroneous pixels
-  for (int i=0; i<context.depthMapSize();i++)
-  {
-    if (inputDepthMap[i] == 0) //Error depth map value 
-      context.depthImage().pixels[i] = color(0,0,0); 
-
-    if ((inputDepthMap[i]< depthMin) || (inputDepthMap[i] > depthMax))  //Irrelevant depths
-      context.depthImage().pixels[i] = color(0,0,0);
+//  for (int i=0; i<depthMapSize;i++)
+//  {
+//    if (inputDepthMap[i] == 0) //Error depth map value 
+//      context.depthImage().pixels[i] = color(0,0,0); 
+//
+//    if ((inputDepthMap[i]< depthMin) || (inputDepthMap[i] > depthMax))  //Irrelevant depths
+//      context.depthImage().pixels[i] = color(0,0,0);
+//  }
+//  
+//  
+//  // The below code clears out objects that are to the left and right of the table
+//  for (int i=0;i<leftThreshold;i++)
+//  {
+//    for (int j=0;j<depthImgHeight;j++)
+//      context.depthImage().pixels[i+j*context.depthWidth()] = color(0,0,0);
+//  }
+//  
+//  for (int i =rightThreshold;i < depthImgWidth;i++)
+//  {
+//    for (int j=0;j<depthImgHeight;j++)
+//      context.depthImage().pixels[i+j*context.depthWidth()] = color(0,0,0);
+//  }
+//  
+//  for (int i = leftThreshold ; i < rightThreshold ; i++){
+//    for (int j = 0 ; j < topThreshold ; j++){
+//      context.depthImage().pixels[i+j*context.depthWidth()] = color(0,0,0);
+//    }  
+//  }
+  
+  for(int i = 0 ; i < depthImgWidth ; i++){
+    for (int j = 0 ; j < depthImgHeight ; j++){
+      if (inputDepthMap[i+j*depthImgWidth] == 0){ //Error depth map value 
+        context.depthImage().pixels[i+j*depthImgWidth] = color(0,0,0); 
+      } else if ((inputDepthMap[i+j*depthImgWidth]< depthMin) || (inputDepthMap[i+j*depthImgWidth] > depthMax)){  //Irrelevant depths
+        context.depthImage().pixels[i+j*depthImgWidth] = color(0,0,0);
+      } else if (i < leftThreshold || i >= rightThreshold){
+        context.depthImage().pixels[i+j*depthImgWidth] = color(0,0,0);
+      } else if (j < topThreshold){
+        context.depthImage().pixels[i+j*depthImgWidth] = color(0,0,0);
+      } 
+    }
   }
   
-  
-  // The below code clears out objects that are to the left and right of the table
-  for (int i=0;i<leftThreshold;i++)
-  {
-    for (int j=0;j<context.depthMapSize()/context.depthWidth();j++)
-      context.depthImage().pixels[i+j*context.depthWidth()] = color(0,0,0);
-  }
-  
-  for (int i =rightThreshold;i < context.depthWidth();i++)
-  {
-    for (int j=0;j<context.depthMapSize()/context.depthWidth();j++)
-      context.depthImage().pixels[i+j*context.depthWidth()] = color(0,0,0);
-  }
 }  
 
   // New filter for edges and error points

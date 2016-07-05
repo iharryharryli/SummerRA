@@ -1,3 +1,11 @@
+//Debug Purpose
+boolean CHALLENGE_MODE_ON = false;
+int DISPLAY_ARRANGEMENT = 0;  // 0 for debug, 1 for projector 
+public int projectorWidth = 1920;
+public int projectorHeight = 1080; 
+public boolean FULL_SCREEN_MODE = false;
+
+
 // Need G4P library
 import g4p_controls.*;
 import javax.swing.JFrame;
@@ -35,22 +43,16 @@ int currentScenarioIndex;
 
 
 // Make the Screen/projector/computer resolution equal
-public int projectorWidth = 1280;
-public int projectorHeight = 720; 
-public boolean FULL_SCREEN_MODE = false;
+
 public int touchscreenWidth = 1024;
 public int touchscreenHeight = 600;
-public int projectorWidthDummy = projectorWidth;
-public int projectorHeightDummy = projectorHeight;
-//public int projectorHeightDummy = projectorHeight;
-public int DummyMainWidth =touchscreenWidth;
-public int DummyMainHeight =touchscreenHeight;
+
 
 // These Values need to be calibrated by Young Wook for making sure that the towers are placed at the patch of the Blocks
-int kinectCenter = 290; 
+int kinectCenter = 301; 
 int leftTowerLeft = 190;
-int leftTowerRight = 260;
-int rightTowerLeft = 350;
+int leftTowerRight = 271;
+int rightTowerLeft = 340;
 int rightTowerRight = 415;
 
 //Look at the frame count to decide 
@@ -69,7 +71,6 @@ int transitionCounter = 0;
 
 public GameState gs;
 public MainGameState ms;
-public TestMyTowerState ts;
 
 ArrayList<Integer> towerIndex;
 ArrayList<String> towers;
@@ -118,7 +119,6 @@ boolean TestMyTowerIsDrawingKinect = false;
 PImage loadingPage;
 PGraphics pgKinectTablet,pgKinectProjector;
 PApplet projectorDrawDelegate;
-Object kinectDrawDelegate = null;
 boolean untouchable = false;
 
 //Harry Logging
@@ -127,9 +127,14 @@ Logger logger;
 //Challenge Mode
 ChallengeLogic challengelogic;
 
+//Global Variable
+HarryGlobalClass HarryGlobal;
+
 
 
 public void setup(){
+  
+  HarryGlobal = new HarryGlobalClass();
   
   createGUI();
   
@@ -137,7 +142,9 @@ public void setup(){
   
   AudioSetup();
   
-  challengelogic = new ChallengeLogic(); gameTimeout = System.currentTimeMillis() + 120000;
+  //challengelogic = new ChallengeLogic(); //gameTimeout = System.currentTimeMillis() + 120000;
+  gs = GameState.MAIN_MENU;
+  
   
   guessed = false;
   guess = "";
@@ -167,7 +174,7 @@ public void setup(){
   centroidTower = new FloatList();
   
   // setup for file logging 
-  String logfilename = "C:/Users/NoRILLA/Desktop/NorillaLog/Norilla" + month() + day() + year() + "-" + hour()+ "_" + minute() + ".txt";
+  String logfilename = "C:/Users/Norilla/Desktop/NorillaLog/Norilla" + month() + day() + year() + "-" + hour()+ "_" + minute() + ".txt";
   filename = new File(logfilename);
   output = createWriter(filename);
   
@@ -175,13 +182,11 @@ public void setup(){
 
   t = new String[2];
   //
-   DummyMainWidth = width;
-   DummyMainHeight = height; 
-   
+  
    
    //logging
-   String filename1 = "C:/Users/NoRILLA/Desktop/NorillaLog/HarryLog" + month() + day() + year() + "-" + hour()+ "_" + minute() + ".txt";
-   String filename2 = "C:/Users/NoRILLA/Desktop/NorillaLog/HarryFormatted" + month() + day() + year() + "-" + hour()+ "_" + minute() + ".txt";
+   String filename1 = "C:/Users/Norilla/Desktop/NorillaLog/HarryLog" + month() + day() + year() + "-" + hour()+ "_" + minute() + ".txt";
+   String filename2 = "C:/Users/Norilla/Desktop/NorillaLog/HarryFormatted" + month() + day() + year() + "-" + hour()+ "_" + minute() + ".txt";
    PrintWriter file1 = createWriter(new File(filename1));
    PrintWriter file2 = createWriter(new File(filename2));
    
@@ -202,6 +207,11 @@ public void setup(){
   logger.logging(0,new String[]{"Setup Successful"});
   logger.logging(1,new String[]{"Anon Student Id\t Session Id\t Time\t Time Zone\t Student Response Type\t  Tutor Response Type\t  Selection\t  Level(Unit)\t  Level(Section)\t Attempt At Step\t Problem Name\t  Step Name\t  Action\t Input\t   Outcome\t    Feedback Text\t Feedback Classification\t  Condition Name\t  Condition Type\t  KC(Default)\t  KC Category(Default)\t  School\t Class"});
   
+  
+  challengelogic = new ChallengeLogic();
+  
+  setupHomeScene();
+  
   SetupAlready = true;
   
   
@@ -218,7 +228,7 @@ public void detection(){
     public void run(){
       detection();
     }
-  },200);  
+  },120);  
   
 }
 
@@ -239,11 +249,9 @@ public void draw()
   
   
   bd = getBlobScannerObject(bd,srcImage);
-  debugScreen.setImg(srcImage);
   IndexArray = getNum_getIndex (bd);
   
-  
-  //getNum_getIndex does not currently return the num.
+   //getNum_getIndex does not currently return the num.
   towerIndices = IndexArray.array();
   
   if( towers != null)
@@ -255,19 +263,26 @@ public void draw()
   
   for(int i = 0; i < towerIndices.length; i++) 
   {
+    
     String[] towerInfo = getTowerName(bd,towerIndices[i]);
     String  FTowerLabel;
     if(towerInfo[1].equals("right"))
       FTowerLabel= getTowerName(bd,towerIndices[i])[0];
     else
       FTowerLabel = "WrongOrientation";
-    if(bd.getD()[towerIndices[i]].y > 200)
+    if(bd.getD()[towerIndices[i]].y > HarryGlobal.groundThreshold)
     {
       towers.add(FTowerLabel.substring(0,2));
       towerIndex.add(towerIndices[i]);
     }
-    textSize(64);
+    
   }
+  
+  
+  
+  
+  
+  
   
   //checkRelayStatus();
   switch(gs)
@@ -507,7 +522,7 @@ public void draw()
         towerengine.phase[0] = "correct";
           towerengine.phase[1] = "correct";
         
-        uiengine.switchOn(new int[]{3});
+        uiengine.switchOn(new int[]{3,6});
     //    continueButton.setVisible(true);
     //    continueButtonProj.setVisible(true);
         break;
@@ -691,7 +706,7 @@ public void draw()
       
       case FALL_PREDICTION:
 
-       drawContours(towerIndices);
+       drawContours();
       if(guessed == false)
       {
         if(!currPlaying.equals("placePred"))
@@ -704,7 +719,7 @@ public void draw()
                 
         textengine.changeText(21);
         
-        uiengine.switchOn(new int[]{12,13,14,15,16,17});
+        uiengine.switchOn(new int[]{12,13,14,15,16,17,6});
        
       }
       
@@ -753,7 +768,7 @@ public void draw()
           textengine.changeText(24);
         }
         
-        uiengine.switchOn(new int[]{4});
+        uiengine.switchOn(new int[]{4,6});
         //shakeButton.setVisible(true);
         //shakeButtonProj.setVisible(true);
       }
@@ -762,7 +777,7 @@ public void draw()
       break;
       
       case SHAKING:
-      drawContours(towerIndices);
+      drawContours();
       //exit shaking state after something falls or after some number of seconds
       checkRelayStatus();
       handsOffTimeout = System.currentTimeMillis() + 40000;
@@ -804,17 +819,12 @@ public void draw()
       }
               
       leftFallingHeight = towerFallingHeight(bd,towerIndex.get(leftInd),leftHeight);
-      leftFallingAngle1 = towerFallingAngle(bd,towerIndex.get(leftInd),leftAngle1,0);
-      leftFallingAngle2 = towerFallingAngle(bd,towerIndex.get(leftInd),leftAngle2,1);
-      leftFallingDensity = towerFallingAngle(bd,towerIndex.get(leftInd),leftDensity,2);
-      
-//      if (leftFallingAngle1.equals("Fallen") || leftFallingHeight.equals("Fallen")){
-//        leftFalling = "Fallen";
-//      } else {
-//        leftFalling = "Standing";
-//      }
+      leftFallingAngle = towerFallingAngle(bd,towerIndex.get(leftInd),leftAngle,leftDensity);
+       
+//      leftFallingAngle2 = "Standing";
+//      leftFallingDensity = "Standing";
          
-      leftFalling = towerFallingFinalDecision(leftFallingHeight, leftFallingAngle1, leftFallingAngle2, leftFallingDensity);
+      leftFalling = towerFallingFinalDecision(leftFallingHeight, leftFallingAngle);
             
       println("Left: " + leftFalling);
       println("LH: " + leftHeight);
@@ -822,17 +832,12 @@ public void draw()
       debugScreen.text(leftFalling,bd.getA()[towerIndex.get(leftInd)].x-50,40);
       
       rightFallingHeight = towerFallingHeight(bd,towerIndex.get(rightInd),rightHeight);
-      rightFallingAngle1 = towerFallingAngle(bd,towerIndex.get(rightInd),rightAngle1,0);
-      rightFallingAngle2 = towerFallingAngle(bd,towerIndex.get(rightInd),rightAngle2,1);
-      rightFallingDensity = towerFallingAngle(bd,towerIndex.get(rightInd),rightDensity,2);
+      rightFallingAngle = towerFallingAngle(bd,towerIndex.get(rightInd),rightAngle,rightDensity);
       
-//      if (rightFallingAngle1.equals("Fallen") || rightFallingHeight.equals("Fallen")){
-//        rightFalling = "Fallen";
-//      } else {
-//        rightFalling = "Standing";
-//      }
+//      rightFallingAngle2 = "Standing";
+//      rightFallingDensity = "Standing";
       
-      rightFalling = towerFallingFinalDecision(rightFallingHeight, rightFallingAngle1, rightFallingAngle2, rightFallingDensity);
+      rightFalling = towerFallingFinalDecision(rightFallingHeight, rightFallingAngle);
       
       println("Right: " + rightFalling);
       println("RH: " + rightHeight);
@@ -856,7 +861,7 @@ public void draw()
       break;
       
       case REASON_PREDICTION:
-      drawContours(towerIndices);
+      drawContours();
       //backButton.setVisible(false);
       //backButtonProj.setVisible(false);
       if(!fallen.equals(currentScenario.expectedResult))
@@ -864,7 +869,7 @@ public void draw()
         //The wrong tower fell! Go to a something went wrong state
         ms = MainGameState.UNEXPECTED_OUTCOME;
         
-        uiengine.switchOn(new int[]{3});
+        uiengine.switchOn(new int[]{3,6});
        // continueButton.setVisible(true); 
        // continueButtonProj.setVisible(true);     
         output.println(" The wrong tower fell");
@@ -987,7 +992,7 @@ public void draw()
       case REASON:
      
       
-      uiengine.switchOn(new int[]{3});
+      uiengine.switchOn(new int[]{3,6});
       
       if(guessedReason.equals(reason))
       {
@@ -1204,6 +1209,9 @@ public void draw()
         logger.logging(0,new String[]{"Something unexpected happened"});
       }
       
+      textengine.changeText(34);
+      uiengine.switchOn(new int[]{3,6});
+      
      // image(txtUnexpectedOutcome, touchText.x, touchText.y);
      // g.removeCache(txtUnexpectedOutcome);
       // PImage howToPlaceResized = howToPlace.get();
@@ -1230,350 +1238,9 @@ public void draw()
     }
     
     break;
-    
-    case TEST_MY_TOWER:
-    
-    drawTestMyTower();
-    switch(ts)
-    {
-      case PLACING_TOWER:
-      
-      currSprite = 0;
-      fallen = "";
-      if(!(currPlaying.equals("tmtPlace") ||  currPlaying.equals("tmtTooMany")))
-      {
-        aplayer.close();
-        aplayer = minim.loadFile("Assets/audio/testmytower_prompt.wav", 2048);
-        aplayer.play();
-        currPlaying = "tmtPlace";
-      }
-      
-      if(towers.size() <= 1)
-      {
-        if(towers.size() == 0)
-        {
-          
-          setTestMyTowerStages(new int[]{1});
-          textengine.changeText(31);
-           uiengine.switchOn(new int[]{6});
-           TestMyTowerIsDrawingKinect = false;
-        }
-        
-        else
-        {
-          
-          drawContours(towerIndices);
-          //New Code Added
-          leftHeight = bd.getBlobHeight(towerIndex.get(0));
-          // println("The height of the standing tower is :"+leftHeight);
-          
-          uiengine.switchOn(new int[]{4,6});
-
-      
-          
-          TestMyTowerIsDrawingKinect = true;
-          textengine.changeText(31);
-          setTestMyTowerStages(null);
-        }
-      }
-      
-      else
-      {
-        if(!currPlaying.equals("tmtTooMany"))
-        {
-          aplayer.close();
-          aplayer = minim.loadFile("Assets/audio/testmytower_toomanytowers.wav", 2048);
-          aplayer.play();
-          currPlaying = "tmtTooMany";
-        }
-        TestMyTowerIsDrawingKinect = false;
-          uiengine.switchOn(new int[]{6});
-          textengine.changeText(32);
-          setTestMyTowerStages(new int[]{2});
-
-      }
-      
-      break; 
-      
-      
-      case SHAKING:
-      drawContours(towerIndices);
-      checkRelayStatus();
-      
-      TestMyTowerIsDrawingKinect = true;
-      //need timer
-      setTestMyTowerStages(new int[]{3});
-      long currTime = System.currentTimeMillis();
-      if(shakingTimeout < currTime)
-      {
-        fallTime = 5000;
-        ts = TestMyTowerState.RESULT;  
-        relayOff();
-        
-         uiengine.switchOn(new int[]{3});
-
-     
-        shakingTimeout = System.currentTimeMillis() + 5000;
-      }
-      
-      if(towerIndex.size() < 1)
-      {
-        fallTime = currTime - startTime;
-        relayOff();
-        fallen = "tmtFell";
-        ts = TestMyTowerState.RESULT;
-        
-        uiengine.switchOn(new int[]{3,6});
-
-        elapsedTime = Math.min(5000,currTime - startTime);
-        shakeTime = String.format("%.2f", (elapsedTime/1000)) + " sec";
-        /*fill(51);
-        textSize(34);
-        //lalala
-        text(shakeTime, 0.546*touchscreenWidth, 0.416*touchscreenHeight); */
-        drawTextOnTablet(shakeTime);
-        shakingTimeout = System.currentTimeMillis() + 5000;
-        return;   
-      }
-          
-      // Adding for Centroid Check
-      float centTX = bd.getBoxCentX(IndexArray.get(0));
-      
-      
-       centroidTower.append(centTX);
-      if(tableHoldTimeout + 2000 < System.currentTimeMillis())
-      {
-        float centroidRange = 0; 
-        centroidRange= centroidTower.max() - centroidTower.min();
-        print("Centroid Range is: " +centroidRange);
-        print("shaking Range is: " +shakingRange);
-        print("Size of the array: " + centroidTower.size());
-        if (centroidRange < shakingRange ) 
-        {
-          relayOff();
-          ts = TestMyTowerState.RESET;
-          centroidTower.clear(); 
-          output.println("Tower Held/ Something went wrong");
-          break;
-        }
-        
-        centroidTower.clear(); 
-        tableHoldTimeout =System.currentTimeMillis();
-      }
-      
-      // finishing Centroid Check
-      
-      leftFallingHeight = towerFallingHeight(bd,towerIndex.get(0),leftHeight);
-      leftFallingAngle1 = towerFallingAngle(bd,towerIndex.get(0),leftAngle1,0);
-      leftFallingAngle2 = towerFallingAngle(bd,towerIndex.get(0),leftAngle2,1);
-      leftFallingDensity = towerFallingAngle(bd,towerIndex.get(0),leftDensity,2);
-      
-      ArrayList<Contour> areas = getContours();
-      
-//      float blobAreaDiff;
-//      float blobAreaThreshold = 9;
-      
-//      if (!areas.isEmpty()){
-//      
-//        blobAreaDiff = (blobArea - areas.get(0).area()) / blobArea * 100;
-//      
-//      } else {
-//        
-//        blobAreaDiff = blobAreaThreshold + 1;
-//      } 
-//      println("Area difference: " + blobAreaDiff);
-      
-//      String leftFallingArea = towerFallingArea();     
-      
-      if (leftFallingAngle1.equals("Fallen") || leftFallingHeight.equals("Fallen")){
-        leftFalling = "Fallen";
-      } else {
-        leftFalling = "Standing";
-      }
-      
-      println("\nleft falling height: " + leftFallingHeight);
-      println("left falling angle: " + leftFallingAngle1);
-      println("left falling angle: " + leftFallingAngle2);
-      
-      
-      
-      if (leftFalling == "Fallen")
-      {
-        fallen = "tmtFell";
-        fallTime = currTime - startTime;
-        relayOff();
-        ts = TestMyTowerState.RESULT;  
-        uiengine.switchOn(new int[]{3,6});
-        
-           
-        shakingTimeout = System.currentTimeMillis() + 5000;       
-      }
-      
-      elapsedTime = Math.min(5000,currTime - startTime);
-      shakeTime = String.format("%.2f", (elapsedTime/1000)) + " sec";
-      drawTextOnTablet(shakeTime);
-      break;
-      
-      
-      case RESULT:
-      drawContours(towerIndices);
-      if(elapsedTime == 5000)
-      {
-        if(!currPlaying.equals("towerStood"))
-        {
-          aplayer.close();
-          aplayer = minim.loadFile("Assets/audio/testmytower_standing.wav", 2048);
-          aplayer.play();
-          currPlaying = "towerStood";
-          output.println("The user made a tower that could stand for 5 sec");
-          output.println(" ");
-        }
-        setTestMyTowerStages(null);
-        textengine.changeText(26);
-        tmtStood = true;
-      }
-      
-      else
-      {
-        if(!currPlaying.equals("towerFell"))
-        {
-          aplayer.close();
-          aplayer = minim.loadFile("Assets/audio/testmytower_fell.wav", 2048);
-          aplayer.play();
-          currPlaying = "towerFell";
-          output.println("The user made a tower that could last only: " + elapsedTime/1000 + " secs");
-          output.println(" ");
-        }
-        
-        setTestMyTowerStages(new int[]{3});
-        textengine.changeText(29);
-        shakeTime = String.format("%.2f", (elapsedTime/1000)) + " sec";
-        drawTextOnTablet(shakeTime);
-        tmtStood = false;
-      }
-      
-      long currTime2 = System.currentTimeMillis();
-      if(shakingTimeout < currTime2)
-      {
-        if(opencv.findContours().size() == 0)
-        {
-          currentScenarioIndex = (currentScenarioIndex+1)%scenarioList.length;
-          if(transitionCounter >= 3)
-          {
-            ts = TestMyTowerState.TRANSITION;
-            transitionCounter = 0;
-          }
-          
-          else
-          {
-            output.println("New scenario started @ Time:" + minute() +":"+ second());
-            ts = TestMyTowerState.PLACING_TOWER;
-            
-                  uiengine.switchOn(new int[]{4});
-
-          //  shakeButton.setVisible(true);
-          //  shakeButtonProj.setVisible(true);
-            transitionCounter++;
-          }
-          
-      
-          
-                uiengine.switchOn(new int[]{6});
-
-        //  continueButton.setVisible(false);
-        //  continueButtonProj.setVisible(false);
-        }
-      }
-      
-      
-      TestMyTowerIsDrawingKinect = true;
-      break;
-      
-      
-      case RESET:
-      
-      TestMyTowerIsDrawingKinect = false;
-      centroidTower.clear(); 
-      if(!currPlaying.equals("clearTable"))
-      {
-        aplayer.close();
-        aplayer = minim.loadFile("Assets/audio/clear_table.wav", 2048);
-        aplayer.play();
-        currPlaying = "clearTable";
-        output.println(" ");
-        output.println("New Scenario started");
-      }
-      
-      
-            uiengine.switchOn(new int[]{6});
-
-    //  continueButton.setVisible(false);
-  //    continueButtonProj.setVisible(false);
-    //  shakeButton.setVisible(false);
-   //   shakeButtonProj.setVisible(false);
-    //  image(clearTable, touchText.x, touchText.y);
-     
-       setTestMyTowerStages(new int[]{4});
-      //image(removeArrows, touchArrows.x,touchArrows.y);
-      //arrowsImg = removeArrows.get();
-      if(opencv.findContours().size() == 0)
-      {
-        currentScenarioIndex = (currentScenarioIndex+1)%scenarioList.length;
-        if(transitionCounter >= 3)
-        {
-          ts = TestMyTowerState.TRANSITION;
-          transitionCounter = 0;
-        }
-        
-        else
-        {
-          output.println("New scenario started @ Time:" + minute() + ":" + second());
-          ts = TestMyTowerState.PLACING_TOWER;
-                uiengine.switchOn(new int[]{4});
-
-       //   shakeButton.setVisible(true);
-       //   shakeButtonProj.setVisible(true);
-          transitionCounter++;
-        }
-      }
-      break;
-      
-      
-      case CHALLENGE:
-      
-    //  background(bg2DummyTab);
-      pushMatrix();
-      stroke(165, 42, 42);
-      fill(165, 42,42);
-      rect(600, 350, 10, 100);
-      popMatrix();
-      drawContours(towerIndices);
-      break;
-      
-      
-      case TRANSITION:
-      
-      if(!currPlaying.equals("transition"))
-      {
-        aplayer.close();
-        aplayer = minim.loadFile("Assets/audio/transition_to_game.wav", 2048);
-        aplayer.play();
-        currPlaying = "transition";
-      }
-      textengine.changeText(-1);
-      TestMyTowerIsDrawingKinect = false;
-      setTestMyTowerStages(null);
-      
-   
-      break;
-    }
-    
-    break;
-    
-    
-    case COMPETE:
-    break;
   }
+  
+  
   
   if(!(bd.getBlobsNumber() == oldNumBlobs))
   {
@@ -1583,15 +1250,15 @@ public void draw()
   
   if(System.currentTimeMillis() > gameTimeout)
   {
-    gs = GameState.MAIN_MENU;
+  //  gs = GameState.MAIN_MENU;
     //ShuffleArray(scenarioList);
-    println("Game Timed out");
-    output.println("New user started the game");
+  //  println("Game Timed out");
+  //  output.println("New user started the game");
   }
 }
 
 
-public void drawContours(int[] ind)
+public void drawContours()
 {
   
   drawCon();
@@ -1643,7 +1310,7 @@ void drawCon()
    //Filter contours to only lego towers
    for (Contour contour: towerContours)
    {
-     if(contour.area() > 1500)//used to be 1500
+     if(contour.area() > HarryGlobal.minimumBlobSize)//used to be 1500
      {
        filteredContours.add(contour);
      }
@@ -1654,67 +1321,4 @@ void drawCon()
  }
  
   
-public PGraphics createKinectGraph(){
-  PGraphics res = createGraphics(touchscreenWidth,touchscreenHeight);
-  res.beginDraw();
-  ArrayList<Contour> inputContours = getContours();
-  res.pushMatrix();
-  res.fill(140, 255, 140);   
-  res.stroke(0, 200, 0);
-  res.strokeWeight(5);
-  res.scale(.85*((float)width/640.0),((float)height/480.0));
-  
-  res.translate(touchscreenWidth*.07,-touchscreenHeight*0.05);
-  
-  
-  for (int i=0; i<inputContours.size(); i++)
-  {
-    if(!fallen.equals(""))
-     {
-       Rectangle r = inputContours.get(i).getBoundingBox();
-       if(fallen.equals("left") && ((r.x + r.width/2) < kinectCenter))
-       {
-         res.fill(255, 140, 140);
-         res.stroke(255, 0, 0);
-       }
-       
-       else if(fallen.equals("left") && ((r.x + r.width/2) > kinectCenter))
-       {
-         res.fill(140, 255, 140);
-         res.stroke(0, 200, 0);
-       }
-       
-       else if(fallen.equals("right") && ((r.x + r.width/2) < kinectCenter))
-       {
-         res.fill(140, 255, 140);
-         res.stroke(0, 200, 0);
-       }
-       else if(fallen.equals("right") && ((r.x + r.width/2) > kinectCenter))
-       {
-         res.fill(255, 140, 140);
-         res.stroke(255, 0, 0);
-       }
-       
-       else if(fallen.equals("tmtFell"))
-       {
-         res.fill(255, 140, 140);
-         res.stroke(255, 0, 0);
-       }
-     }
-      
-     res.beginShape();
-     
-     for (PVector point : inputContours.get(i).getPoints())
-     {
-       res.vertex(point.x, point.y);
-      
-     }
-     res.endShape();
-   }
-   res.popMatrix();
-   
-  res.endDraw();
- 
-  return res;
-}
 

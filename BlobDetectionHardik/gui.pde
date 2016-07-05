@@ -6,8 +6,13 @@
  
 
 public void playMainGameClick(GImageButton source, GEvent event){
-  uiengine.switchOn(new int[]{});
-  source.setEnabled(false);
+  if(untouchable)return;
+      commonDelay();
+  uiengine.turnBtn(new int[]{1,2,28},false);
+  uiengine.turnBtn(new int[]{6},true);
+  
+  
+ 
   
   ShuffleArray(scenarioList);
 
@@ -22,7 +27,6 @@ public void playMainGameClick(GImageButton source, GEvent event){
   lCounterFlag = 0;
   
   handsOffTimeout = System.currentTimeMillis() + 60000;
-  uiengine.switchOn(new int[]{6});
   
   transitionCounter = 0;
   //gs = GameState.MAIN_GAME;
@@ -31,37 +35,35 @@ public void playMainGameClick(GImageButton source, GEvent event){
   {
     gs = GameState.MAIN_GAME;
     ms = MainGameState.PLACING_TOWERS;
-    
+    towerengine.on = true;
   }
   else
  {
+   
    gs = GameState.MAIN_GAME;
    ms = MainGameState.RESET;
    transitionCounter = -1;
   }
 
-  towerengine.on = true;
+  
   
   logger.logging(3,new String[]{hour()+"",minute()+"",second()+"",
                                   3600*hour()+"",60*minute()+"",second()+"",1+""});
-  source.setEnabled(true);
 } 
 
 public void testMyTowerClick(GImageButton source, GEvent event) { 
- // gs = GameState.CHALLENGE;
- // transitionCounter = 0;
- // return;
-  source.setEnabled(false);
-  println("imgButton1 - GImageButton >> GEvent." + event + " @ " + millis());
-  output.println(" ");
-  output.println("TestmyTower mode selected @ Time: " + minute() + ":"+ second()); // 
-  transitionCounter = 0;
-  gs = GameState.TEST_MY_TOWER;
-
-    ts = TestMyTowerState.PLACING_TOWER;
+  if(untouchable)return;
+      commonDelay();
+   uiengine.turnBtn(new int[]{1,2,28},false);
+   uiengine.turnBtn(new int[]{6},true);
+  if(gs == GameState.CHALLENGE){
+    challengelogic.control.keepPlayingClick();
+    return;
+  }
   
-   uiengine.switchOn(new int[]{6});
-   source.setEnabled(true);
+    challengelogic.switchIn();
+     
+     
 } 
 
 public void continueClick(GImageButton source, GEvent event) { 
@@ -115,25 +117,7 @@ public void continueClick(GImageButton source, GEvent event) {
         rightTower.add("notPlaced");
       }
     }
-    else if(gs == GameState.TEST_MY_TOWER)
-    {
-      if(transitionCounter >= 3)
-            {
-              ts = TestMyTowerState.TRANSITION;
-              transitionCounter = 0;
-            }
-            else
-            {
-              output.println("New scenario started @ Time:" + minute() +":"+ second());
-              ts = TestMyTowerState.PLACING_TOWER;
-              
-                    uiengine.switchOn(new int[]{4});
-
-              transitionCounter++;
-            }
    
-    }
-    
           uiengine.switchOn(new int[]{6});
 
   source.setEnabled(true);
@@ -207,76 +191,18 @@ public void shakeClick(GImageButton source, GEvent event) {
       rightHeight = bd.getBlobHeight(towerIndex.get(rightInd));
       
       
-      float[] angleArrayLeft = getBlobAngle(bd, towerIndex.get(leftInd));
-      float[] angleArrayRight = getBlobAngle(bd, towerIndex.get(rightInd));
+      float[] eigArrayLeft = getBlobEigen(bd, towerIndex.get(leftInd));
+      float[] eigArrayRight = getBlobEigen(bd, towerIndex.get(rightInd));
       
-//      leftAngle1 = getBlobAngle(bd, towerIndex.get(leftInd));
-//      rightAngle1 = getBlobAngle(bd, towerIndex.get(rightInd));
-      
-      leftAngle1 = angleArrayLeft[0];
-      rightAngle1 = angleArrayRight[0]; 
+      leftAngle = eigArrayLeft[0];
+      rightAngle = eigArrayRight[0]; 
  
-      leftAngle2 = angleArrayLeft[1];
-      rightAngle2 = angleArrayRight[1];
- 
-      leftDensity = angleArrayLeft[2];
-      rightDensity = angleArrayRight[2];     
+      leftDensity = eigArrayLeft[1];
+      rightDensity = eigArrayRight[1];     
       
       relayOn();
       break;
-    case TEST_MY_TOWER:
-      if(ts == TestMyTowerState.PLACING_TOWER)
-      {
-        
-        if(towers.size() != 1 || towerIndex.size() != 1){
-          source.setEnabled(false);
-          return;
-        }
-        leftHeight = bd.getBlobHeight(towerIndex.get(0));
-        
-        float[] angleArray = getBlobAngle(bd, towerIndex.get(0));
-        
-//        leftAngle1 = getBlobAngle(bd, towerIndex.get(0));
-        leftAngle1 = angleArray[0];
-        leftAngle2 = angleArray[1];
-        leftDensity = angleArray[2]; 
-        
-        ArrayList<Contour> areas = getContours();
-        
-        blobArea = areas.get(0).area();
-        
-        shakingTimeout = System.currentTimeMillis() + 5000;
-        startTime = System.currentTimeMillis();
-        ts = TestMyTowerState.SHAKING;
-        output.println("Table selected for shaking @ Time: " + minute() + ":"+ second());
-        
-                uiengine.switchOn(new int[]{});
-
-        aplayer.close();
-        relayOn();
-        tableHoldTimeout = System.currentTimeMillis();
-        centroidTower.clear(); 
-
-      }
-      else if(ts == TestMyTowerState.CHALLENGE)
-      {
-        if(bd.getBlobHeight(towerIndex.get(0)) < 100)
-        {
-          source.setEnabled(false);
-          return;
-        }
-        leftHeight = bd.getBlobHeight(towerIndex.get(0));
-    
-        shakingTimeout = System.currentTimeMillis() + 5000;
-        startTime = System.currentTimeMillis();
-        ts = TestMyTowerState.SHAKING;
-                uiengine.switchOn(new int[]{});
-
-  
-        relayOn();
-          
-      }
-      break;
+   
     }
     source.setEnabled(true);
   
@@ -373,31 +299,29 @@ public void win_draw1(GWinApplet appc, GWinData data) {
     case MAIN_GAME:
       drawMainGameProj(appc);
       break;
-    case TEST_MY_TOWER:
-      drawTestMyTower(appc);
-      break;
+   
     case COMPETE:
       break;
   }
 } 
 
 public void backButtonClick(GImageButton source, GEvent event) {
-  source.setEnabled(false);
-  uiengine.switchOn(new int[]{});
+  if(untouchable)return;
+      commonDelay();
+  setupHomeScene();
   
   
+  relayOff();
   towerengine.on = false;
  
   
   aplayer.close();
   currPlaying = "";
-  if(gs != GameState.MAIN_MENU && (ms == MainGameState.SHAKING || ts == TestMyTowerState.SHAKING))
-    return;
+ 
   gs = GameState.MAIN_MENU;
-  challengelogic = null;
-  kinectDrawDelegate = null;
+  HarryGlobal.kinectDrawDelegate = null;
+  HarryGlobal.kinectDrawDelegate = new KinectForGames(HarryGlobal.kinectDrawer);
   output.println(" ");
-  source.setEnabled(true);
  
 } 
 
@@ -436,8 +360,8 @@ public void createGUI(){
   if(frame != null)
     frame.setTitle("Tablet Window ");
 
-  window1 = new GWindow(this, "EarthShake Projector", 0, 0, projectorWidth, projectorHeight, FULL_SCREEN_MODE, JAVA2D); // The flag is set as true to remove borders and make it fullscreen on the projector
-//  window1 = new GWindow(this, "EarthShake Projector", touchscreenWidth, 0, projectorWidth, projectorHeight, FULL_SCREEN_MODE, JAVA2D); // The flag is set as true to remove borders and make it fullscreen on the projector
+  if(DISPLAY_ARRANGEMENT == 0)  window1 = new GWindow(this, "EarthShake Projector", 0, 0, projectorWidth, projectorHeight, FULL_SCREEN_MODE, JAVA2D); // The flag is set as true to remove borders and make it fullscreen on the projector
+  else window1 = new GWindow(this, "EarthShake Projector", touchscreenWidth, 0, projectorWidth, projectorHeight, FULL_SCREEN_MODE, JAVA2D); // The flag is set as true to remove borders and make it fullscreen on the projector
  
   window1.setActionOnClose(G4P.EXIT_APP);
   window1.addDrawHandler(this, "win_draw1");
@@ -484,6 +408,7 @@ public void createGUI(){
   29: transition text (test tower mode)
   30: crying gorilla
   31: transparent too many towers
+  32: unexpected outcome
   
   Animations:
   9: proud gorilla
@@ -500,7 +425,8 @@ public void createGUI(){
       new UIButton(new int[]{1},3,this,new String[]{"ui_elements/continue_btn.png"},0.55,0.83,0.26,0.14,"continueClick"),
       new UIButton(new int[]{0},4,this,new String[]{"ui_elements/shake_btn.png"},0.35,0.82,0.3,0.17,"shakeClick"),
       new UIButton(new int[]{1},4,this,new String[]{"ui_elements/shake_btn.png"},0.55,0.83,0.26,0.14,"shakeClick"),
-      new UIButton(new int[]{0,1},6,this,new String[]{"ui_elements/home_button.png"},0.85,0.82,0.13,0.17,"backButtonClick"),
+      new UIButton(new int[]{0},6,this,new String[]{"ui_elements/home_button.png"},0.83,0.8,0.13,0.17,"backButtonClick"),
+      new UIButton(new int[]{1},6,this,new String[]{"ui_elements/home_button.png"},0.87,0.83,0.13,0.17,"backButtonClick"),
       
       new UIButton(new int[]{0},12,this,new String[]{"ui_elements/tower_first.png"},0.27,0.27,www,hhh,"predictTower1Click"),
       new UIButton(new int[]{0},13,this,new String[]{"ui_elements/tower_second.png"},0.53,0.27,www,hhh,"predictTower2Click"),
@@ -532,15 +458,19 @@ public void createGUI(){
       new UIImage(new int[]{1},24,0.62,0.32,0,0.5,"AssetsProjector/ui_elements/down_arrow_makemytower.png"), 
       new UIImage(new int[]{0},25,0.32,0.27,0,0.5,"AssetsTablet/ui_elements/too_many_towers.png"), 
       new UIImage(new int[]{1},25,0.5,0.23,0,0.5,"AssetsTablet/ui_elements/too_many_towers.png"), 
-      new UIImage(new int[]{0},26,0.42,0.22,0.4,0,"AssetsTablet/ui_elements/hour_glass.png"), 
-      new UIImage(new int[]{1},26,0.72,0.3,0.3,0,"AssetsTablet/ui_elements/hour_glass.png"), 
+//      new UIImage(new int[]{0},26,0.42,0.22,0.4,0,"AssetsTablet/ui_elements/hour_glass.png"), 
+//      new UIImage(new int[]{1},26,0.72,0.3,0.3,0,"AssetsTablet/ui_elements/hour_glass.png"),
+      new UIImage(new int[]{0},26,0.56,0.22,0.4,0,"hour_glass_flipped.png"),
+      new UIImage(new int[]{1},26,0.71,0.3,0.3,0,"hour_glass_flipped.png"),
       new UIImage(new int[]{0},27,-0.1,0,1,0.358,"Assets/text/transition.png"), 
       new UIImage(new int[]{1},27,-0.07,0.02,0.8,0.28,"Assets/text/transition.png"), 
       new UIImage(new int[]{0},29,-0.1,0,1,0.358,"Assets/text/transition_toPlayGame.png"), 
       new UIImage(new int[]{1},29,-0.07,0.02,0.8,0.28,"Assets/text/transition_toPlayGame.png"), 
       new UIImage(new int[]{1},30,0.03,0.25,0,0.7,"Assets/sprites/sad2.png"),
-      new UIImage(new int[]{0},31,0.32,0.27,0,0.5,"ChallengeMode/too_many_towers_alpha.png"), 
-      new UIImage(new int[]{1},31,0.5,0.23,0,0.5,"ChallengeMode/too_many_towers_alpha.png"),
+      new UIImage(new int[]{0},31,0.32,0.27,0,0.5,"ChallengeMode/too_many_towers_transparent.png"), 
+      new UIImage(new int[]{1},31,0.5,0.23,0,0.5,"ChallengeMode/too_many_towers_transparent.png"),
+      new UIImage(new int[]{0},32,0.32,0.27,0,0.5,"AssetsTablet/ui_elements/place_in_correct_spot.png"), 
+      new UIImage(new int[]{1},32,0.5,0.23,0,0.5,"AssetsTablet/ui_elements/place_in_correct_spot.png"), 
       
       
       
@@ -593,6 +523,14 @@ public void createGUI(){
                    "Assets/text/tmtPrompt.png",
                     "Assets/text/testmytower_placeonlyonetower.png",
                      "Assets/text/transition.png",
+                   "Assets/text/unexpected.png",
+                   "ChallengeMode/text/text_bubble_challenge_not_tall_enough.png",   //35
+                   "ChallengeMode/text/text_bubble_challenge_ruler_tall_enough.png", 
+                   "ChallengeMode/text/text_bubble_challenge_tower_fell.png", 
+                   "ChallengeMode/text/text_bubble_challenge_tower_stayed_up.png", 
+                   "ChallengeMode/text/prompt.png", 
+                   "ChallengeMode/text/handsoff.png", //40
+                   "ChallengeMode/text/goodjob.png", 
                    
                  },0,0,1,0.358,0.2,0.02,0.8,0.28,100);
                  
@@ -711,16 +649,16 @@ GImageButton keepPlayingProj;
 //Harry's helper functions
 void drawTextOnTablet(String text){
   fill(51);
-  textSize(34);
-  text(text, 0.48*touchscreenWidth, 0.39*touchscreenHeight); 
+  textSize(34*touchscreenWidth/1024);
+  text(text, 0.78*touchscreenWidth, 0.4*touchscreenHeight); 
 }
-void drawTextOnProjector(GWinApplet appc,String text){
+void drawTextOnProjector(PApplet appc,String text){
   appc.fill(32);
-  appc.textSize(30);
-  appc.text(text, 0.78*projectorWidth, 0.43*projectorHeight); 
+  appc.textSize(34*projectorWidth/1280);
+  appc.text(text, 0.87*projectorWidth, 0.44*projectorHeight); 
 }
 void commonDelay(){
-  int ddelay = 700;
+  int ddelay = 500;
   untouchable = true;
   Timer timer = new Timer();
   timer.schedule(new TimerTask(){

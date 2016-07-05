@@ -6,7 +6,7 @@
 
 String[] towerLabeling_3D(float xMoi,float yMoiTop,float yMoiBottom,float towerWidth)
 {
-  float thresholdMOI = 12;
+  float thresholdMOI = 7;
   String towerName;
 
 //  float[] NtowersX = {2170,2660,2380,2260,1210,1410,860,925,1020,1020,1570,1685,1975,1715,1640,1665,1065,1240,1875,2270};
@@ -22,45 +22,62 @@ String[] towerLabeling_3D(float xMoi,float yMoiTop,float yMoiBottom,float towerW
  String[] NtowerNames = {"A1left", "A1right",  "A2left", "A2right", "B1left", "B1right", "B2left", "B2right", "E2left", "E2right", "B3left", "B3right", "B4left", "B4right", "C1left", "C1right", "C2left", "C2right", "D1left", "D1right", "E1left", "E1right", "D2left", "D2right", "D3left", "D3right", "D4left", "D4right"};
 */
 
- float[] NtowersX  =      {  1750,      1700,    1800,    1880,    500 ,    1080,      1000,    1150,    1940,    1620,    1830,    580    ,  550 ,     530 ,      510 ,  1380};
+ float[] NtowersX  =      {  1750,      1700,    1800,    1880,    500 ,    1080,      1000,    1150,    1940,    1620,    1830,    580    ,  550 ,     530 ,      510 ,  1100};
  
- float[] NtowersYTop  =   {  3200,      4300,    2720,    4650,    3530,    4025,      3630,    2080,    1990,    4520,    6510,    5280  ,    5300,      2350,    2320,  2485};
- float[] NtowersYBottom = {  3960,      3000,    4720,    2670,    3600,    3400,      3600,    3210,    3140,    6470,    4300,      5500,    5290,    2450,    2280,    2550}; 
+ float[] NtowersYTop  =   {  3200,      4300,    2720,    4650,    3530,    4025,      3630,    2080,    1990,    4520,    6510,    5280  ,    5300,      2350,    2320,  2540};
+ float[] NtowersYBottom = {  3960,      3000,    4720,    2670,    3600,    3400,      3600,    3210,    3140,    6470,    4300,      5500,    5290,    2450,    2280,    2420}; 
  String[] NtowerNames = {  "A1left","A2right","E2left","B2left","B1right","B4left","B3right","C1left","C2right","E1left","D1left","D2right","D2left","D3right","D3left","D4close"};
 
   
   lookupXMoment_3D = createLookupMoment(NtowersX);// this is a dynamic array 
   lookupYMomentTop= createLookupMoment(NtowersYTop); // this is a dynamic array
   lookupYMomentBottom = createLookupMoment(NtowersYBottom);
-//towerXMoment.append(300);
+  //towerXMoment.append(300);
   float[] diffXMoment_3D = diffMeanMoment(lookupXMoment_3D.array(),xMoi);
   float[] diffYMomentBottom = diffMeanMoment(lookupYMomentBottom.array(),yMoiBottom);
   float[] diffYMomentTop = diffMeanMoment(lookupYMomentTop.array(),yMoiTop);
-//println(diffXMoment);
+  //println(diffXMoment);
   float[] absolutediff = getDist_3D(diffXMoment_3D,diffYMomentBottom,diffYMomentTop);
-//println(absolutediff);
+  //println(absolutediff);
   int minIndex = findLowestValueIndex(absolutediff);
-  float distLowestVal = getLowestValueDistance(absolutediff, minIndex);
+//  float distLowestVal = getLowestValueDistance(absolutediff, minIndex);
 
 
-float referenceAbsoluteValue = sqrt(absolutediff[minIndex]*100*100/(NtowersX[minIndex]*NtowersX[minIndex] + NtowersYBottom[minIndex]*NtowersYBottom[minIndex] +NtowersYTop[minIndex]*NtowersYTop[minIndex]));
+  float referenceAbsoluteValue = sqrt(absolutediff[minIndex]*100*100/(NtowersX[minIndex]*NtowersX[minIndex] + NtowersYBottom[minIndex]*NtowersYBottom[minIndex] +NtowersYTop[minIndex]*NtowersYTop[minIndex]));
 
-//println(referenceAbsoluteValue);
-if (referenceAbsoluteValue > thresholdMOI)
-{
-  towerName = "Unknown";
-} else
-{
-  towerName = NtowerNames[minIndex];
-}
+  //  println(referenceAbsoluteValue);
+
+  if (NtowerNames[minIndex].equals("D4close")) 
+    thresholdMOI = 12;
+
+  if (referenceAbsoluteValue > thresholdMOI)
+  {
+    towerName = "Unknown";
+  } else
+  {
+    towerName = NtowerNames[minIndex];
+  }
   
-  String Orientation = towerOrientation(towerWidth,minIndex,towerName, distLowestVal);
+  String Orientation = towerOrientation(towerWidth,minIndex,towerName);
   
   String[] rString = {towerName,Orientation};
 
   return rString;
 }
 //////////////////////////////////////////////////
+
+//boolean isAllDistCloseEnough(float xTestMoi, float yTopTestMoi, float yBottomTestMoi){
+//   
+//  float threshold = 150;
+//  if (abs(xTestMoi) < threshold && abs(yTopTestMoi) < threshold && abs(yBottomTestMoi) < threshold){
+//    return true; 
+//  } else {
+//    return false; 
+//  }
+//  
+//}
+
+
 
 // This function is used to get distance from each Tower
 
@@ -79,8 +96,8 @@ return absvalue.array();
 ////////////////////////////////////
 //// these globals will be deleted ////
 
-String distLowestGlobal = "";
-float distLowestValGlobal = 0;
+//String distLowestGlobal = "";
+//float distLowestValGlobal = 0;
 // This function is used to get closest Tower
 int findLowestValueIndex(float[] distArray){
   
@@ -91,15 +108,15 @@ for (int i= 1;i<distArray.length;i++){
         }
 }
 
- distLowestGlobal = "" + distArray[minInd];
- distLowestValGlobal = distArray[minInd];
+// distLowestGlobal = "" + distArray[minInd];
+// distLowestValGlobal = distArray[minInd];
 
  return minInd;   
 }
 
-float getLowestValueDistance(float[] distArray, int minInd){
-  return distArray[minInd];
-}
+//float getLowestValueDistance(float[] distArray, int minInd){
+//  return distArray[minInd];
+//}
 
 float[] diffMeanMoment(float[] meanMoment, float MomentOfInertia){
   

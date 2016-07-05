@@ -9,14 +9,14 @@ class ChallengeControl{
        
         leftHeight = bd.getBlobHeight(towerIndex.get(0));
         
-        float[] angleArray = getBlobAngle(bd, towerIndex.get(0));     
-        leftAngle1 = angleArray[0];
-        leftAngle2 = angleArray[1];
-        leftDensity = angleArray[2]; 
-       
-        ArrayList<Contour> areas = getContours();
+        float[] eigArray = getBlobEigen(bd, towerIndex.get(0));  
+        float[] moiArray = calculateMoI(bd, towerIndex.get(0));
         
-        blobArea = areas.get(0).area();
+        leftAngle = eigArray[0];
+        leftDensity = eigArray[1]; 
+        
+        leftMoIx = moiArray[0];
+        leftMoIy = moiArray[1];
         
         shakingTimeout = System.currentTimeMillis() + 5000;
         startTime = System.currentTimeMillis();
@@ -28,19 +28,61 @@ class ChallengeControl{
         centroidTower.clear(); 
   }
   
-  public void continueBtnClick(){
-    father.cs = ChallengeMyTowerState.PLACING_TOWER;
-      uiengine.turnBtn(new int[]{3},false);
+  public void handOver(){
+          
+          father.destroy();
+          father = null;
   }
+  
+  public void transition(){
+    father.cs = ChallengeMyTowerState.TRANSITION;
+    uiengine.turnBtn(new int[]{1,2},true);
+    uiengine.turnBtn(new int[]{6},false);
+  }
+  
+  
+  public void continueBtnClick(){
+      uiengine.turnBtn(new int[]{3},false);
+      father.trials ++;
+      
+      
+      if(father.cs == ChallengeMyTowerState.SUCCESS && father.challengeReceived < 5){
+        father.cs = ChallengeMyTowerState.RESET;
+        if(father.noRuler && CHALLENGE_MODE_ON){
+          father.noRuler=false;
+          father.rulerEngine.turnOnRulers();
+        }
+      }
+      else if(father.trials > 2 || father.cs == ChallengeMyTowerState.SUCCESS){
+          transition();
+      }
+      else{
+        father.gotoMain();
+      }
+      
+  }
+  
+  public void keepPlayingClick(){
+    
+    uiengine.switchOn(new int[]{6});
+    
+    if(father.success){
+      father.challengeReceived = 0;
+      father.cs = ChallengeMyTowerState.RESET;
+    }
+    else{
+      father.trials = 0;
+      father.gotoMain();
+    }
+  }
+       
   
 }
 
 class ChallengeLogic{
   
   ChallengeMyTowerState cs;
-  
-  private int relayFlag = 0;
-  
+    
   RulerEngine rulerEngine;
   
   ChallengeUI UI;
@@ -50,29 +92,65 @@ class ChallengeLogic{
   boolean towerOK;
   
   private long handsOffTime;
+  
+  private long startCheckingTimeout;
  
+  int realTowerNum;
+  
+  int trials;
+  
+  int challengeReceived;
+  
+  String shakedTimeText;
+  
+  boolean success;
+  
+  boolean noRuler;
   
   ChallengeLogic(){
    
-   cs = ChallengeMyTowerState.PLACING_TOWER;
+   cs = ChallengeMyTowerState.RESET;
    rulerEngine = setupRulers();
    UI = new ChallengeUI(rulerEngine,this);
-   gs = GameState.CHALLENGE; 
+   
    control = new ChallengeControl(this);
-   kinectDrawDelegate = new KinectArtistForChallenge(this);
+   
    towerOK = false;
+   realTowerNum = -1;
+   shakedTimeText = "";
+   trials = 0;
+   challengeReceived = 0;
+   success = false;
+   noRuler = true;
   }
+  
+  void switchIn(){
+    cs = ChallengeMyTowerState.RESET;
+    towerOK = false;
+     realTowerNum = -1;
+     shakedTimeText = "";
+     trials = 0;
+     challengeReceived = 0;
+     success = false;
+     noRuler = true;
+     HarryGlobal.kinectDrawDelegate = null;
+     HarryGlobal.kinectDrawDelegate = new KinectForChallenge(HarryGlobal.kinectDrawer,this);
+     gs = GameState.CHALLENGE; 
+  }
+  
+ 
   
   
  private boolean assureValid(){
-   if(towers.size() == 1 && rulerEngine.tallEnough)return true;
+   if(realTowerNum == 1 && rulerEngine.tallEnough)return true;
    else return false;
  }
  
  private void towerChecking(){
-   if(towers.size() <= 1)
+   if(System.currentTimeMillis() < startCheckingTimeout)return;
+   if(realTowerNum <= 1)
       {
-        if(towers.size() == 0)
+        if(realTowerNum == 0)
         {
           // This is for the case where no block is placed on table
           
@@ -96,60 +174,89 @@ class ChallengeLogic{
         cs = ChallengeMyTowerState.TOO_MANY_FIRST; 
       }    
  }
+ 
+ private void resultCommon(){
+   if(realTowerNum == 0)control.continueBtnClick();
+ }
    
  void play(){
+   
+   
    switch(cs){
      case PLACING_TOWER:
+      if(noRuler)textengine.changeText(31);
+      else textengine.changeText(39);
       towerChecking();
+      indicateTowerState(rulerEngine,-1);
       break;
       
       case TOO_MANY_FIRST:
-      
+      textengine.changeText(28);
       towerChecking();
+      indicateTowerState(rulerEngine,-1);
       break;
       
       
       
       case ENOUGH:
       
-      
+      //textengine.changeText(40);
       
       handsOffTime = System.currentTimeMillis();
       cs = ChallengeMyTowerState.ENOUGH_DELAY;
-      openHandsOff(rulerEngine);
+     // indicateTowerState(rulerEngine,0);
       
       
       break;
       
       case ENOUGH_DELAY:
+      
+      HarryGlobal.canRegisterHeight = true;
+      
+      
       long currentT = System.currentTimeMillis();
-      if(currentT - handsOffTime > 2000){
-        closeHandsOff(rulerEngine);
-        if(assureValid())uiengine.turnBtn(new int[]{4},true);
-        else{
-          uiengine.turnBtn(new int[]{4},false);
-          cs = ChallengeMyTowerState.PLACING_TOWER;
+      
+      if(assureValid()){
+        if(currentT - handsOffTime > -1300){
+          indicateTowerState(rulerEngine,1);
+          uiengine.turnBtn(new int[]{4},true);
+          if(noRuler) textengine.changeText(31);
+          else textengine.changeText(36);
         }
       }
+      else{
+        
+        uiengine.turnBtn(new int[]{4},false);
+          cs = ChallengeMyTowerState.PLACING_TOWER;
+      }
+      
+
       
       break;
       
       case TOO_SHORT:
-      
+      if(!noRuler)textengine.changeText(35);
+      indicateTowerState(rulerEngine,2);
       towerChecking();
       
       break;
       
       case SHAKING:
-
+      
+      HarryGlobal.canRegisterHeight = false;
+      
+      indicateTowerState(rulerEngine,-1);
       //need timer
       long currTime = System.currentTimeMillis();
+      elapsedTime = Math.min(5000,currTime - startTime);
+        shakedTimeText = String.format("%.2f", (elapsedTime/1000)) + " sec";
+        
       if(shakingTimeout < currTime)
       {
         fallTime = 5000;
         cs = ChallengeMyTowerState.SUCCESS;  
         relayOff();
-        println("SHAKING -> FAIL");
+        println("SHAKING -> SUCCESS");
         shakingTimeout = System.currentTimeMillis() + 5000;
       }
       
@@ -162,8 +269,7 @@ class ChallengeLogic{
         
         println("SHAKING -> FAIL");
         
-        elapsedTime = Math.min(5000,currTime - startTime);
-        shakeTime = String.format("%.2f", (elapsedTime/1000)) + " sec";
+        
 
         shakingTimeout = System.currentTimeMillis() + 5000;
         return;   
@@ -171,12 +277,13 @@ class ChallengeLogic{
      
       
       leftFallingHeight = towerFallingHeight(bd,towerIndex.get(0),leftHeight);
-      leftFallingAngle1 = towerFallingAngle(bd,towerIndex.get(0),leftAngle1,0);
-      leftFallingAngle2 = towerFallingAngle(bd,towerIndex.get(0),leftAngle1,1);
-      leftFallingDensity = towerFallingAngle(bd,towerIndex.get(0),leftDensity,2);
+      leftFallingAngle = towerFallingAngle(bd,towerIndex.get(0),leftAngle,leftDensity);
+      leftFallingMoI = towerFallingMoI(bd,towerIndex.get(0),leftMoIx,leftMoIy);
+      println(leftFallingMoI);
+//      leftFallingAngle2 = "Standing";
+//      leftFallingDensity = "Standing";
       
-
-      leftFalling = towerFallingFinalDecision(leftFallingHeight, leftFallingAngle1, leftFallingAngle2, leftFallingDensity);
+      leftFalling = towerFallingFinalDecision(leftFallingHeight, leftFallingAngle);
       
       if (leftFalling == "Fallen")
       {
@@ -191,35 +298,54 @@ class ChallengeLogic{
       break;
       
       case FAIL:
-      
+      textengine.changeText(37);
       towerOK = false;
-      //cs = ChallengeMyTowerState.RESET;
-      //println("FAIL -> RESET");
       uiengine.turnBtn(new int[]{3},true);
+      resultCommon();
+      success = false;
       break;
       
       case SUCCESS:
+      textengine.changeText(41);
       towerOK = true;
-      //cs = ChallengeMyTowerState.RESET;
-      
-     // println("FAIL -> RESET");
-     
       uiengine.turnBtn(new int[]{3},true);
-     
+      resultCommon();
+      success = true;
       break;
       
       case RESET:
+      textengine.changeText(7);
+      if(towers.size()==0)cs = ChallengeMyTowerState.SETUP;  
+    
+      break;
       
-     // cs = ChallengeMyTowerState.PLACING_TOWER;
+      case SETUP:
       
-      relayFlag = 0;
+      float newChallengeDelta = 15;
+      trials = 0;   
+      if(noRuler)rulerEngine.resizeByHeight(0.01);
+      else rulerEngine.resizeByHeight(HarryGlobal.towerHeightInPixel + newChallengeDelta);
+      gotoMain();
+      challengeReceived ++;
+      break;
       
+      case TRANSITION:
       break;
       }
-     // println(cs);
    }
    
+   public void gotoMain(){
+     cs = ChallengeMyTowerState.PLACING_TOWER;
+     startCheckingTimeout = System.currentTimeMillis() + 2000;
+   }
    
-//    ChallengeMyTowerState getChallengeMyTowerState(){return cs;}
-     
+   public void destroy(){
+     HarryGlobal.kinectDrawDelegate = null;
+     HarryGlobal.kinectDrawDelegate = new KinectForGames(HarryGlobal.kinectDrawer);
+     rulerEngine = null;
+     UI = null;
+     control = null;
+     System.gc();
+   }
+        
 }

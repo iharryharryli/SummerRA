@@ -40,6 +40,7 @@ public Scenario[] listOfScenarios()
   Scenario s8 = new Scenario("symmetry", "D3", "D4", "right");
   
   Scenario[] s =  new Scenario[]{s0, s1, s2, s3, s4, s6, s7, s8};
+  // Scenario[] s =  new Scenario[]{s0, s0, s0, s0, s0, s0, s0, s0};
   //Scenario[] s = new Scenario[]{s0};
   ShuffleArray(s);
   return s;

@@ -1,9 +1,9 @@
-String towerOrientation( float towerWidth, int towerIndex,String towername, float distLowestVal)
+String towerOrientation( float towerWidth, int towerIndex,String towername)
 
 {
 
-float[] NtowerWid  =  {  81     ,  85     ,  83    ,  85    ,   42    ,  68    ,    63   ,  85    ,  81     ,  80    ,   84   ,    45   ,   46   ,  45     , 44     ,  61     };
-
+//float[] NtowerWid  =  {  81     ,  85     ,  83    ,  85    ,   42    ,  68    ,    63   ,  85    ,  81     ,  80    ,   84   ,    45   ,   42   ,  45     , 44     ,  61     };
+float[] NtowerWid  =  {  77     ,  77     ,  80    ,  81    ,   40    ,  62    ,    60   ,  82    ,  78     ,  77    ,   79   ,    40   ,   41   ,  40     , 39     ,  64     };
 String[] NtowerNames = {"A1left","A2right","E2left","B2left","B1right","B4left","B3right","C1left","C2right","E1left","D1left","D2right","D2left","D3right","D3left","D4close"} ;
 
   
@@ -14,21 +14,7 @@ String[] NtowerNames = {"A1left","A2right","E2left","B2left","B1right","B4left",
 //         float  NtowerWid = {80,90,120};
 //         Width of A2 = 90;
 //           
-  
-  float distanceThreshold;
-  
-  if (t == null){
-    distanceThreshold = 0;
-  }
-  if ((t[0].equals("A1") && t[1].equals("A2")) || (t[0].equals("A2") && t[1].equals("A1"))){
-    distanceThreshold = 49000;
-  } else {
-    distanceThreshold = 90000; 
-  }
-  
-  
-      
- 
+    
   if (towername == "Unknown")
   {
     return "wrong2";
@@ -39,7 +25,7 @@ String[] NtowerNames = {"A1left","A2right","E2left","B2left","B1right","B4left",
     //int indexTower = NtowerNames.indexOf("towername");
     float matingWidth = NtowerWid[towerIndex];
     float percentageChange = (abs( matingWidth - towerWidth))*100/matingWidth;
-    if (percentageChange < 15 && (distLowestVal < distanceThreshold))
+    if (percentageChange < 15 )
     {
       return "right";
     }

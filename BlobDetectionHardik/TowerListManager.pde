@@ -19,6 +19,8 @@ public void towerManager()
   {
     float centX = bd.getBoxCentX(towerIndex.get(0));
     
+    
+    
     if(towers.contains(t[0]) && (centX < kinectCenter) && (centX > leftTowerLeft && centX < leftTowerRight))
     {
       leftTower.add("correct");
@@ -69,33 +71,14 @@ public void towerManager()
       leftLocation = 1;
       rightLocation = 0;
     }
-    //current towers to look for 
-    if(towers.get(leftLocation).equals(t[0]) && towers.get(rightLocation).equals(t[1]) && (centXL > leftTowerLeft && centXL < leftTowerRight) &&  (centXR > rightTowerLeft && centXR < rightTowerRight))
-    {
-      leftTower.add("correct");
-    rightTower.add("correct"); 
-
-    }
-    //Maybe check for the position in the scene as well?
-    else if(towers.contains(t[0]) && towers.indexOf(t[0]) == leftLocation && (centXL > leftTowerLeft && centXL < leftTowerRight))
-    {
-      leftTower.add("correct");
-    rightTower.add("wrong"); 
-    }
-    else if(towers.contains(t[1]) && towers.indexOf(t[1]) == rightLocation  &&  (centXR > rightTowerLeft && centXR < rightTowerRight))
-    {
-     leftTower.add("wrong");
-    rightTower.add("correct");  
-    }
-    else
-    {
-     leftTower.add("wrong");
-    rightTower.add("wrong"); 
-    }
-    //println("Left: " + leftLocation);
-    //println("Right: " + rightLocation);
-    //println("Location of t[0]: " + towers.indexOf(t[0]));
     
+    if(towers.get(leftLocation).equals(t[0]) && (centXL > leftTowerLeft && centXL < leftTowerRight))leftTower.add("correct");
+    else leftTower.add("wrong");
+    
+    if(towers.get(rightLocation).equals(t[1]) && (centXR > rightTowerLeft && centXR < rightTowerRight)) rightTower.add("correct");
+    else rightTower.add("wrong");
+    
+   
   }
   else if(towers.size() > 2)
   {

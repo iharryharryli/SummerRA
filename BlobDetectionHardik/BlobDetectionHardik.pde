@@ -2,62 +2,36 @@
 
 // This is the master code after 16th december merge
 
-
-
-
-String[] getTowerName (Detector Towers,int Blobnumber)
+String[] getTowerName (Detector blobs,int blobNumber)
 {
-  PVector[] V1 = Towers.getBlobPixelsLocation(Blobnumber);
- // float Width = Towers.getBlobWidth(Blobnumber);
-  //println("Width is:"+ Width);
-  //The bounding box corners are identified as follows:
- 
-//          A---------B
-//          |         |
-//          |         |
-//          |         |
-//          C---------D
-//
-// The rispective methods to compute them are :
-// corners A getA()
-// corners B getB()
-// corners C getC()
-// corners D getD()
-  //PVector[] V2 =bd.getBlobPixelsLocation(1);
+  if(gs != GameState.MAIN_GAME) return new String[]{"Unkown Err", "wrong3"};
   
-  PVector[] cornerA = Towers.getA();// top left corner of the blob
-  PVector[] cornerC = Towers.getC();// bottom let corner of the blob
-  PVector[] cornerB = Towers.getB();// top right corner of the Blob
-  PVector[] cornerD = Towers.getD(); // bottom right corner of the Blob
-
-  //String[] TowerLabel = calculateMoI_bothAxis(V1, cornerA[Blobnumber] , cornerC[Blobnumber],cornerB[Blobnumber],cornerD[Blobnumber]);
-  //return TowerLabel;
-  return calculateMoI_bothAxis(V1, cornerA[Blobnumber] , cornerC[Blobnumber],cornerB[Blobnumber],cornerD[Blobnumber]);
-
-}
-
-// Below function returns the towerLabel
-
-String[] calculateMoI_bothAxis(PVector[] pixelArray,PVector topLeftC, PVector bottomLeftC,PVector topRightC, PVector  bottomRightC)
-{
-  float xMoment = 0;
-  float yMoment_lowerAxis = 0;
-  float yMoment_topAxis = 0;
+  try{
+    blobs.getBlobsNumber();
+  } catch(NullPointerException e){
+    String[] nullErrorResult = {"Unknown", "wrong"} ;
+    return nullErrorResult; 
+  }
+  
+  PVector[] pixelArray = blobs.getBlobPixelsLocation(blobNumber);
+  
+  PVector topLeftC = blobs.getA()[blobNumber];// top left corner of the blob
+  PVector bottomLeftC = blobs.getC()[blobNumber];// bottom let corner of the blob
+  PVector topRightC = blobs.getB()[blobNumber];// top right corner of the Blob
+  PVector bottomRightC = blobs.getD()[blobNumber]; // bottom right corner of the Blob
+  
   float boxH =  bottomLeftC.y - topLeftC.y ;
   float boxW  = (topRightC.x - topLeftC.x + bottomRightC.x - bottomLeftC.x)/2 ;
 
-  for (int i =0; i < pixelArray.length; i++)
-  {
-    if(topLeftC == null || bottomLeftC == null)
+  if(topLeftC == null || bottomLeftC == null)
         return new String[]{"Unkown Err", "wrong3"};
-        
-      xMoment = xMoment + (pixelArray[i].x-topLeftC.x)*(pixelArray[i].x-topLeftC.x);
-      yMoment_lowerAxis = yMoment_lowerAxis + (- pixelArray[i].y + bottomLeftC.y)*(-pixelArray[i].y+bottomLeftC.y);
-      yMoment_topAxis = yMoment_topAxis + (-topLeftC.y + pixelArray[i].y)*(-topLeftC.y + pixelArray[i].y);
-    }
-  xMoment = xMoment/pixelArray.length;
-  yMoment_lowerAxis = yMoment_lowerAxis/pixelArray.length;
-  yMoment_topAxis = yMoment_topAxis/pixelArray.length;
+
+//  float[] moiArray = calculateMoI(pixelArray, topLeftC, bottomLeftC);
+  float[] moiArray = calculateMoI(blobs, blobNumber);
+  
+  float xMoment = moiArray[0];
+  float yMoment_lowerAxis = moiArray[1];
+  float yMoment_topAxis = moiArray[2];
   
   String textdisplayX =  "x: "+str(xMoment) ;
   String textdisplayYLow = "ylow: "+  str(yMoment_lowerAxis);
@@ -69,15 +43,13 @@ String[] calculateMoI_bothAxis(PVector[] pixelArray,PVector topLeftC, PVector bo
 
   String leftCorneer = "lCornerX: " +str(topLeftC.x);
   
-  float arrayList1 = getRotatedAngle(pixelArray, topLeftC, boxH, boxW);
-  float arrayList2 = getRotatedAngle(pixelArray, bottomLeftC, boxH, boxW);  
-  float eigenValue1 = getEigenValue(pixelArray, topLeftC, boxH, boxW);
+  float[] eigArray = getRotatedAngle(pixelArray, topLeftC, boxH, boxW);
   
-  float[] arrayList = {arrayList1, arrayList2};
+  float angle = eigArray[0];
+  float eigenValue = eigArray[1];
   
-  String angleText1 = "1st angle: " + arrayList[0];
-  String angleText2 = "2nd angle: " + arrayList[1];
-  String eigenValueText = "Distribution Density: " + eigenValue1;
+  String angleText = "Angle: " + angle;
+  String eigenValueText = "Density: " + eigenValue;
   
   // below commands are used to draw text on the debug Screen in the game
   debugScreen.addText(leftCorneer,topLeftC.x-50,60);
@@ -87,17 +59,42 @@ String[] calculateMoI_bothAxis(PVector[] pixelArray,PVector topLeftC, PVector bo
   debugScreen.addText(towerWidth,topLeftC.x-50,80);
   debugScreen.addText( TowerLabel[0],topLeftC.x-50,160);
   debugScreen.addText(TowerLabel[1],topLeftC.x-50,180);
-  debugScreen.addText(angleText1,topLeftC.x-50,200);
-  debugScreen.addText(angleText2,topLeftC.x-50,220);
-  debugScreen.addText(eigenValueText, topLeftC.x-50,240);
-  debugScreen.addText("Distance with the ref: " + distLowestGlobal,topLeftC.x-50,260);
-   
+  debugScreen.addText(angleText,topLeftC.x-50,200);
+  debugScreen.addText(eigenValueText, topLeftC.x-50,220);
   
   return TowerLabel;
 
 }
 
-float[] getBlobAngle(Detector Towers, int Blobnumber){
+//float[] calculateMoI(PVector[] pixelArray, PVector topLeftC, PVector bottomLeftC){
+float[] calculateMoI(Detector blobs, int blobNumber){  
+  PVector[] pixelArray = blobs.getBlobPixelsLocation(blobNumber);
+  
+  PVector topLeftC = blobs.getA()[blobNumber];// top left corner of the blob
+  PVector bottomLeftC = blobs.getC()[blobNumber];// bottom let corner of the blob
+  
+  float xMoment = 0;
+  float yMoment_lowerAxis = 0;
+  float yMoment_topAxis = 0;
+  
+  for (int i =0; i < pixelArray.length; i++)
+  {
+      xMoment = xMoment + (pixelArray[i].x-topLeftC.x)*(pixelArray[i].x-topLeftC.x);
+      yMoment_lowerAxis = yMoment_lowerAxis + (- pixelArray[i].y + bottomLeftC.y)*(-pixelArray[i].y+bottomLeftC.y);
+      yMoment_topAxis = yMoment_topAxis + (-topLeftC.y + pixelArray[i].y)*(-topLeftC.y + pixelArray[i].y);
+  }
+  
+  xMoment = xMoment/pixelArray.length;
+  yMoment_lowerAxis = yMoment_lowerAxis/pixelArray.length;
+  yMoment_topAxis = yMoment_topAxis/pixelArray.length;
+  
+  
+  float[] moiArray = {xMoment, yMoment_lowerAxis, yMoment_topAxis};
+  
+  return moiArray;
+}
+
+float[] getBlobEigen(Detector Towers, int Blobnumber){
   PVector[] V1 = Towers.getBlobPixelsLocation(Blobnumber);
   
   PVector[] cornerA = Towers.getA();// top left corner of the blob
@@ -113,17 +110,13 @@ float[] getBlobAngle(Detector Towers, int Blobnumber){
   float boxH =  bottomLeftC.y - topLeftC.y ;
   float boxW  = (topRightC.x - topLeftC.x + bottomRightC.x - bottomLeftC.x)/2 ;  
   
-  float angleArray1  = getRotatedAngle(V1, topLeftC, boxH, boxW);
-  float angleArray2 = getRotatedAngle(V1, topRightC, boxH, boxW);
-  float angleDensity = getEigenValue(V1, topLeftC, boxH, boxW);
-  
-  float[] angleArray = {angleArray1, angleArray2, angleDensity};
-  
-  return angleArray;
+  float[] eigArray = getRotatedAngle(V1, topLeftC, boxH, boxW);
+
+  return eigArray;
   
 }
 
-float getRotatedAngle(PVector[] pixelArray, PVector topLeftC, float boxH, float boxW){
+float[] getRotatedAngle(PVector[] pixelArray, PVector topLeftC, float boxH, float boxW){
   
   int rows = round(boxH);
   int cols = round(boxW);
@@ -133,11 +126,13 @@ float getRotatedAngle(PVector[] pixelArray, PVector topLeftC, float boxH, float 
   
   int allPixels = rows*cols;
   
-  double [][] points = new double[pixelArray.length][2];
+  int pointNum = pixelArray.length;
+  
+  double [][] points = new double[pointNum][2];
   int count = 0;
   
   
-  for ( int i = 0 ; i < pixelArray.length ; i++){
+  for(int i = 0 ; i < pointNum ; i++){
       points[i][0] = (double) (pixelArray[i].x - topLeftC.x);
       points[i][1] = (double) (rows - (pixelArray[i].y - topLeftC.y));
   }
@@ -146,44 +141,15 @@ float getRotatedAngle(PVector[] pixelArray, PVector topLeftC, float boxH, float 
   pointMat = pointMat.transpose();
   
   Matrix cov = pointMat.times(pointMat.transpose());
-  Matrix eig = cov.eig().getV();
+  Matrix eigVec = cov.eig().getV();
+  Matrix eigVal = cov.eig().getD();
   
-  double angle = Math.toDegrees(Math.atan(eig.get(1, 1) / eig.get(0, 1)));
+  double angle = Math.toDegrees(Math.atan(eigVec.get(1, 1) / eigVec.get(0, 1)));
+  double eigValue = (eigVal.get(1,1) + eigVal.get(0,1)) / pointNum;
   
-  return (float) angle;
+  float[] eigArray = {(float) angle, (float) eigValue};
+  
+  return eigArray;
   
 }
 
-float getEigenValue(PVector[] pixelArray, PVector topLeftC, float boxH, float boxW){
-  
-  int rows = round(boxH);
-  int cols = round(boxW);
-  
-  int x = round(topLeftC.x);
-  int y = round(topLeftC.y);
-  
-  int allPixels = rows*cols;
-  
-  double [][] points = new double[pixelArray.length][2];
-  int count = 0;
-  
-  float xRef = 0;
-  
-  for ( int i = 0 ; i < pixelArray.length ; i++){
-      if ((pixelArray[i].x - topLeftC.x) >= xRef){
-        points[i][0] = (double) (pixelArray[i].x - topLeftC.x) - xRef;
-        points[i][1] = (double) (rows - (pixelArray[i].y - topLeftC.y));
-      }
-  }
-  
-  Matrix pointMat = new Matrix(points);
-  pointMat = pointMat.transpose();
-  
-  Matrix cov = pointMat.times(pointMat.transpose());
-  Matrix eig = cov.eig().getD();
-  
-  double eigValue = (eig.get(1,1) + eig.get(1,0)) / pixelArray.length;
-  
-  return (float) eigValue;
-  
-}

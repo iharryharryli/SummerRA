@@ -13,20 +13,26 @@ String[] NtowerNames;
 int minimumWeight = 2000;
 ////////////// Gaming  Variables
 int leftHeight, rightHeight;
-float leftAngle1, rightAngle1;
-float leftAngle2, rightAngle2;
+float leftAngle, rightAngle;
 float leftDensity, rightDensity;
 
+float leftMoIx, leftMoIy;
+
 String leftFallingHeight = "Standing";
-String leftFallingAngle1 = "Standing";
-String leftFallingAngle2 = "Standing";
-String leftFallingDensity = "Standing";
+String leftFallingAngle = "Standing";
+String leftFallingMoI = "Standing";
+
+//String leftFallingAngle2 = "Standing";
+//String leftFallingDensity = "Standing";
 
 
 String rightFallingHeight = "Standing";
-String rightFallingAngle1 = "Standing";
-String rightFallingAngle2 = "Standing";
-String rightFallingDensity = "Standing";
+String rightFallingAngle = "Standing";
+String rightFallingMoI = "Standing";
+//String rightFallingAngle2 = "Standing";
+//String rightFallingDensity = "Standing";
+
+
 
 String leftFalling = "Standing";
 String rightFalling = "Standing";
@@ -86,13 +92,16 @@ void setupHardik()
   // Initialize the Kinect Image 
   srcImage = context.depthImage();
   opencv = new OpenCV(this, srcImage);
-
+  
  
-bd = new Detector( this, 255 );// Initial value was 255
-
+ //  bd = bdBuffer[0];
+   bd = new Detector( this, 255 );// Initial value was 255
+//bd2 = new Detector( this, 255 );// Initial value was 255
 ////// Game variable
 
 leftHeight = 1;
 rightHeight = 1;
 ////////////////
 }
+
+

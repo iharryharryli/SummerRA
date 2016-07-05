@@ -28,7 +28,7 @@ IntList getNum_getIndex (Detector BlobObject)
   
   for(int i = 0; i < bd.getBlobsNumber(); i++) 
   {
-    if (bd.getBlobWeight(i)>minimumWeight)
+    if (bd.getBlobWeight(i)>HarryGlobal.minimumBlobSize)
     {
       blobArray.append(i);
     }
