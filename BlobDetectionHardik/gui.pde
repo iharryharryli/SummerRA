@@ -310,6 +310,7 @@ public void backButtonClick(GImageButton source, GEvent event) {
       commonDelay();
   setupHomeScene();
   
+  HarryGlobal.audioEngine.cleanUp();
   
   relayOff();
   towerengine.on = false;

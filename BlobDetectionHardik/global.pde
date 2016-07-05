@@ -23,5 +23,7 @@ public class HarryGlobalClass{
     kinectDrawDelegate = new KinectForGames(kinectDrawer);
   }
   
+  public AudioEngine audioEngine;
+  
 }
 

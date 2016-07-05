@@ -43,4 +43,6 @@ public void AudioSetup()
   player_symm = minim.loadFile("Assets/audio/startScreen_ayo.wav", 2048);
   player_weight = minim.loadFile("Assets/audio/startScreen_ayo.wav", 2048);
   player_clear_table = minim.loadFile("Assets/audio/clear_table.wav", 2048);*/
+  
+  setupAudio();
 }

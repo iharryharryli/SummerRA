@@ -22,7 +22,7 @@ class ChallengeControl{
         startTime = System.currentTimeMillis();
         father.cs = ChallengeMyTowerState.SHAKING;
         uiengine.turnBtn(new int[]{4},false);
-        aplayer.close();
+        father.audio.shutUp();
         relayOn();
         tableHoldTimeout = System.currentTimeMillis();
         centroidTower.clear(); 
@@ -44,10 +44,9 @@ class ChallengeControl{
   public void continueBtnClick(){
       uiengine.turnBtn(new int[]{3},false);
       father.trials ++;
-      
-      
+      father.audio.shutUp();
       if(father.cs == ChallengeMyTowerState.SUCCESS && father.challengeReceived < 5){
-        father.cs = ChallengeMyTowerState.RESET;
+        father.cs = ChallengeMyTowerState.INITIAL;
         if(father.noRuler && CHALLENGE_MODE_ON){
           father.noRuler=false;
           father.rulerEngine.turnOnRulers();
@@ -68,7 +67,7 @@ class ChallengeControl{
     
     if(father.success){
       father.challengeReceived = 0;
-      father.cs = ChallengeMyTowerState.RESET;
+      father.cs = ChallengeMyTowerState.INITIAL;
     }
     else{
       father.trials = 0;
@@ -89,6 +88,8 @@ class ChallengeLogic{
   
   ChallengeControl control;
   
+  AudioEngine audio;
+  
   boolean towerOK;
   
   
@@ -108,7 +109,7 @@ class ChallengeLogic{
   
   ChallengeLogic(){
    
-   cs = ChallengeMyTowerState.RESET;
+   cs = ChallengeMyTowerState.INITIAL;
    rulerEngine = setupRulers();
    UI = new ChallengeUI(rulerEngine,this);
    
@@ -120,10 +121,12 @@ class ChallengeLogic{
    challengeReceived = 0;
    success = false;
    noRuler = true;
+   
+   audio = HarryGlobal.audioEngine;
   }
   
   void switchIn(){
-    cs = ChallengeMyTowerState.RESET;
+    cs = ChallengeMyTowerState.INITIAL;
     towerOK = false;
      shakedTimeText = "";
      trials = 0;
@@ -133,6 +136,7 @@ class ChallengeLogic{
      HarryGlobal.kinectDrawDelegate = null;
      HarryGlobal.kinectDrawDelegate = new KinectForChallenge(HarryGlobal.kinectDrawer,this);
      gs = GameState.CHALLENGE; 
+     
   }
   
  
@@ -150,6 +154,7 @@ class ChallengeLogic{
         if(towers.size() == 0)
         {
           // This is for the case where no block is placed on table
+          
           
           cs = ChallengeMyTowerState.PLACING_TOWER;
         }
@@ -181,6 +186,7 @@ class ChallengeLogic{
    
    switch(cs){
      case PLACING_TOWER:
+      
       if(noRuler)textengine.changeText(31);
       else textengine.changeText(39);
       towerChecking();
@@ -189,8 +195,11 @@ class ChallengeLogic{
       
       case TOO_MANY_FIRST:
       //textengine.changeText(28);
+      if(!audio.isPlaying())audio.playOnce(2);
       towerChecking();
       indicateTowerState(rulerEngine,-1);
+      if(cs != ChallengeMyTowerState.TOO_MANY_FIRST && audio.lastPlayed == 2)audio.shutUp();
+      
       break;
       
       
@@ -286,6 +295,7 @@ class ChallengeLogic{
       break;
       
       case FAIL:
+      audio.playOnce(4);
       textengine.changeText(37);
       towerOK = false;
       uiengine.turnBtn(new int[]{3},true);
@@ -294,6 +304,7 @@ class ChallengeLogic{
       break;
       
       case SUCCESS:
+      audio.playOnce(3);
       textengine.changeText(41);
       towerOK = true;
       uiengine.turnBtn(new int[]{3},true);
@@ -303,7 +314,11 @@ class ChallengeLogic{
       
       case RESET:
       textengine.changeText(7);
-      if(towers.size()==0)cs = ChallengeMyTowerState.SETUP;  
+      if(towers.size()==0){
+        audio.shutUp();
+        cs = ChallengeMyTowerState.SETUP; 
+      } 
+     
     
       break;
       
@@ -319,12 +334,19 @@ class ChallengeLogic{
       
       case TRANSITION:
       break;
+      
+      case INITIAL:
+      audio.cleanUp();
+      if(towers.size()!=0)audio.play(0);
+      cs = ChallengeMyTowerState.RESET;
+      break;
       }
    }
    
    public void gotoMain(){
      cs = ChallengeMyTowerState.PLACING_TOWER;
      startCheckingTimeout = System.currentTimeMillis() + 1000;
+     if(noRuler)audio.play(1);
    }
    
    public void destroy(){

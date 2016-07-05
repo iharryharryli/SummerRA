@@ -214,7 +214,7 @@ public void setup(){
   
   SetupAlready = true;
   
-  
+  commonDelay();
 }
 
 public long lastF = 0;
