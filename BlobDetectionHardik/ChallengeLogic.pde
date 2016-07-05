@@ -324,7 +324,7 @@ class ChallengeLogic{
    
    public void gotoMain(){
      cs = ChallengeMyTowerState.PLACING_TOWER;
-     startCheckingTimeout = System.currentTimeMillis() + 2000;
+     startCheckingTimeout = System.currentTimeMillis() + 1000;
    }
    
    public void destroy(){
