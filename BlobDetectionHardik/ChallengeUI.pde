@@ -5,10 +5,15 @@ public RulerEngine setupRulers(){
   
   int tw = touchscreenWidth, th = touchscreenHeight, pw = projectorWidth, ph = projectorHeight;
   
+  String[] lib = new String[]{"ChallengeMode/house1.png","ChallengeMode/house2.png","ChallengeMode/house3.png","ChallengeMode/house4.png"};
+  
   Ruler tabletRuler = new Ruler(this,Math.round(0.1*touchscreenWidth),Math.round(0.7*touchscreenHeight),"ChallengeMode/ruler.png",
-                                          0.57*touchscreenWidth, 0.7*touchscreenHeight,0.45);
+                                          0.57*touchscreenWidth, 0.7*touchscreenHeight,lib);
   Ruler projectorRuler = new Ruler(projectorDrawDelegate,Math.round(0.1*projectorWidth),Math.round(0.7*projectorHeight),"ChallengeMode/ruler.png",
-                                          0.72*projectorWidth, 0.68*projectorHeight,0.45);                                        
+                                          0.72*projectorWidth, 0.68*projectorHeight,lib);        
+  
+  tabletRuler.offsetPos = new PVector(0.03*tw,0); projectorRuler.offsetPos = new PVector(0.03*pw,0);
+                                          
   tabletRuler.components = new RulerAppend[]{new RulerAppend(tw*0.1,0,"ChallengeMode/HandsOff.png",-0.05*tw,-0.2*th),
                                               new RulerAppend(tw*0.1,0,"ChallengeMode/check.png",-0.05*tw,-0.2*th),
                                              new RulerAppend(tw*0.1,0,"ChallengeMode/cross.png",-0.05*tw,-0.2*th),
@@ -179,6 +184,9 @@ class Ruler{
   PVector curPos;
   PVector defaultPos;
   PVector appendPos;
+  PVector offsetPos;
+  
+  RulerShape shapes;
   
   boolean rulerOn;
   
@@ -186,24 +194,28 @@ class Ruler{
   
   
   private PImage getDrawImg(float len){
-    int x = Math.round(rulerImg.height*(1-len));
-    int y = Math.round(rulerImg.height*len);
-    return rulerImg.get(0,x,rulerImg.width,y);
+    return shapes.fetch(rulerImg.height*len);
+//    if(shapes.index>=0)return shapes.fetch(rulerImg.height*len);
+//    int x = Math.round(rulerImg.height*(1-len));
+//    int y = Math.round(rulerImg.height*len);
+//    return rulerImg.get(0,x,rulerImg.width,y);
   }
   
-  public Ruler(PApplet a,int w,int h,String add,float x,float y,float len){
+  public Ruler(PApplet a,int w,int h,String add,float x,float y,String[] L){
     rulerOn = false;
+    shapes = new RulerShape(L);
     delegate = a;
     rulerImg = loadImage(add);
     rulerImg.resize(w,h);
     curPos = new PVector(x,y);
     defaultPos = new PVector(x,y);
-    drawImg = getDrawImg(len);
+    drawImg = getDrawImg(0.5);
     appendPos = new PVector(0,0);
+    offsetPos = new PVector(0,0);
   }
   
   public void drawMe(){
-    if(rulerOn)delegate.image(drawImg,curPos.x,curPos.y);
+    if(rulerOn)delegate.image(drawImg,curPos.x + offsetPos.x, curPos.y + offsetPos.y);
     if(components != null){
       for(int i=0; i<components.length; i++){
         components[i].drawMe(delegate,appendPos);
@@ -278,5 +290,40 @@ class RulerEngine{
       }
   }
   
+  public void changeRulerShape(int index){
+    for(int i=0; i<rulers.length; i++){
+        rulers[i].shapes.choose(index);
+      }
+  }
+  
+}
+
+public class RulerShape{
+  PImage[] imgs;
+  public int index = 0;
+  public RulerShape(String[] lib){
+    imgs = new PImage[lib.length];
+    for(int i=0; i<lib.length; i++){
+      imgs[i] = loadImage(lib[i]);
+    }
+  }
+  
+  
+  public void choose(int i){
+    if(i>=0 && i<imgs.length){
+      index = i;
+    }
+  }
+  
+  
+  public PImage fetch(float h){
+    int hh = (int)h;
+    if(hh==0)hh=2;
+    
+    PImage res = imgs[index].get();
+    res.resize(0,hh);
+    
+    return res;
+  }
 }
 

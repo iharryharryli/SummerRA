@@ -40,17 +40,22 @@ class ChallengeControl{
     uiengine.turnBtn(new int[]{6},false);
   }
   
+  private void upgrade(){
+    father.cs = ChallengeMyTowerState.INITIAL;
+    
+        if(father.noRuler && CHALLENGE_MODE_ON){
+          father.noRuler=false;
+          father.rulerEngine.turnOnRulers();
+        }
+    
+  }
   
   public void continueBtnClick(){
       uiengine.turnBtn(new int[]{3},false);
       father.trials ++;
       father.audio.shutUp();
       if(father.cs == ChallengeMyTowerState.SUCCESS && father.challengeReceived < 5){
-        father.cs = ChallengeMyTowerState.INITIAL;
-        if(father.noRuler && CHALLENGE_MODE_ON){
-          father.noRuler=false;
-          father.rulerEngine.turnOnRulers();
-        }
+        upgrade();
       }
       else if(father.trials > 2 || father.cs == ChallengeMyTowerState.SUCCESS){
           transition();
@@ -328,8 +333,10 @@ class ChallengeLogic{
       trials = 0;   
       if(noRuler)rulerEngine.resizeByHeight(0.01);
       else rulerEngine.resizeByHeight(HarryGlobal.towerHeightInPixel + newChallengeDelta);
+      challengeReceived ++;   
+      rulerEngine.changeRulerShape(challengeReceived-1);
       gotoMain();
-      challengeReceived ++;
+      
       break;
       
       case TRANSITION:
@@ -346,6 +353,7 @@ class ChallengeLogic{
    public void gotoMain(){
      cs = ChallengeMyTowerState.PLACING_TOWER;
      startCheckingTimeout = System.currentTimeMillis() + 1000;
+     audio.cleanUp();
      if(noRuler)audio.play(1);
    }
    
