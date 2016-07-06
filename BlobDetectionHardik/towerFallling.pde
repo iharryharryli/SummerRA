@@ -40,7 +40,7 @@ String towerFallingHeight(Detector Blobs, int blobNumber,int blobHeight){
 String towerFallingAngle(Detector Blobs, int blobNumber, float blobAngle, float blobDensity){
   
   int angleThreshold = 15;
-  float densityThreshold = 25;
+  float densityThreshold = 35;
   
   float[] eigArray = getBlobEigen(Blobs, blobNumber);
     

@@ -468,8 +468,8 @@ public void createGUI(){
       new UIImage(new int[]{0},29,-0.1,0,1,0.358,"Assets/text/transition_toPlayGame.png"), 
       new UIImage(new int[]{1},29,-0.07,0.02,0.8,0.28,"Assets/text/transition_toPlayGame.png"), 
       new UIImage(new int[]{1},30,0.03,0.25,0,0.7,"Assets/sprites/sad2.png"),
-      new UIImage(new int[]{0},31,0.32,0.27,0,0.5,"ChallengeMode/too_many_towers_transparent.png"), 
-      new UIImage(new int[]{1},31,0.5,0.23,0,0.5,"ChallengeMode/too_many_towers_transparent.png"),
+      new UIImage(new int[]{0},31,0.32,0.27,0,0.5,"ChallengeMode/only_one_tower.png"), 
+      new UIImage(new int[]{1},31,0.5,0.23,0,0.5,"ChallengeMode/only_one_tower.png"),
       new UIImage(new int[]{0},32,0.32,0.27,0,0.5,"AssetsTablet/ui_elements/place_in_correct_spot.png"), 
       new UIImage(new int[]{1},32,0.5,0.23,0,0.5,"AssetsTablet/ui_elements/place_in_correct_spot.png"), 
       

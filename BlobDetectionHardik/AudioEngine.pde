@@ -58,6 +58,7 @@ public class AudioEngine{
   }
   
   public boolean isPlaying(){
+    if(player == null)return false;
     return player.isPlaying();
   }
 }
