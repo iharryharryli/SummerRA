@@ -12,7 +12,7 @@ public RulerEngine setupRulers(){
   Ruler projectorRuler = new Ruler(projectorDrawDelegate,Math.round(0.1*projectorWidth),Math.round(0.7*projectorHeight),"ChallengeMode/ruler.png",
                                           0.72*projectorWidth, 0.68*projectorHeight,lib);        
   
-  tabletRuler.offsetPos = new PVector(0.03*tw,0); projectorRuler.offsetPos = new PVector(0.03*pw,0);
+  tabletRuler.offsetPos = new PVector(0.03*tw,-0.005*th); projectorRuler.offsetPos = new PVector(0.03*pw,-0.005*ph);
                                           
   tabletRuler.components = new RulerAppend[]{new RulerAppend(tw*0.1,0,"ChallengeMode/HandsOff.png",-0.05*tw,-0.2*th),
                                               new RulerAppend(tw*0.1,0,"ChallengeMode/check.png",-0.05*tw,-0.2*th),

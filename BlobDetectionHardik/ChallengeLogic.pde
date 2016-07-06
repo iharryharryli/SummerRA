@@ -54,7 +54,7 @@ class ChallengeControl{
       uiengine.turnBtn(new int[]{3},false);
       father.trials ++;
       father.audio.shutUp();
-      if(father.cs == ChallengeMyTowerState.SUCCESS && father.challengeReceived < 5){
+      if(father.cs == ChallengeMyTowerState.SUCCESS && father.challengeReceived % 5 != 0){
         upgrade();
       }
       else if(father.trials > 2 || father.cs == ChallengeMyTowerState.SUCCESS){
@@ -71,7 +71,7 @@ class ChallengeControl{
     uiengine.switchOn(new int[]{6});
     
     if(father.success){
-      father.challengeReceived = 0;
+      //father.challengeReceived = 0;
       father.cs = ChallengeMyTowerState.INITIAL;
     }
     else{

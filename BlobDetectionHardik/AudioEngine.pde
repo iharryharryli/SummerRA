@@ -70,9 +70,7 @@ public void setupAudio(){
            1,"Assets/audio/testmytower_prompt.wav",
            2,"Assets/audio/testmytower_toomanytowers.wav",
            3,"Assets/audio/testmytower_standing.wav",
-           4,"Assets/audio/testmytower_fell.wav",
-//           2,"Assets/audio/testmytower_prompt.wav",
-           
+           4,"Assets/audio/testmytower_fell.wav",           
    });
    HarryGlobal.audioEngine = e;
 }
