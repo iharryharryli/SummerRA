@@ -54,7 +54,7 @@ class ChallengeControl{
       uiengine.turnBtn(new int[]{3},false);
       father.trials ++;
       father.audio.shutUp();
-      if(father.cs == ChallengeMyTowerState.SUCCESS && father.challengeReceived % 5 != 0){
+      if(father.cs == ChallengeMyTowerState.SUCCESS && father.challengeReceived % 6 != 0){
         upgrade();
       }
       else if(father.trials > 2 || father.cs == ChallengeMyTowerState.SUCCESS){
@@ -332,9 +332,13 @@ class ChallengeLogic{
       float newChallengeDelta = 15;
       trials = 0;   
       if(noRuler)rulerEngine.resizeByHeight(0.01);
-      else rulerEngine.resizeByHeight(HarryGlobal.towerHeightInPixel + newChallengeDelta);
+      else {
+        float temp = HarryGlobal.towerHeightInPixel + newChallengeDelta;
+        if(temp < 80)temp = 80;
+        rulerEngine.resizeByHeight(temp);
+      }
       challengeReceived ++;   
-      rulerEngine.changeRulerShape(challengeReceived-1);
+      rulerEngine.changeRulerShape(challengeReceived-2);
       gotoMain();
       
       break;

@@ -8,11 +8,11 @@ public RulerEngine setupRulers(){
   String[] lib = new String[]{"ChallengeMode/house1.png","ChallengeMode/house2.png","ChallengeMode/house3.png","ChallengeMode/house4.png"};
   
   Ruler tabletRuler = new Ruler(this,Math.round(0.1*touchscreenWidth),Math.round(0.7*touchscreenHeight),"ChallengeMode/ruler.png",
-                                          0.57*touchscreenWidth, 0.7*touchscreenHeight,lib);
+                                          0.46*touchscreenWidth, 0.7*touchscreenHeight,lib);
   Ruler projectorRuler = new Ruler(projectorDrawDelegate,Math.round(0.1*projectorWidth),Math.round(0.7*projectorHeight),"ChallengeMode/ruler.png",
-                                          0.72*projectorWidth, 0.68*projectorHeight,lib);        
+                                          0.62*projectorWidth, 0.68*projectorHeight,lib);        
   
-  tabletRuler.offsetPos = new PVector(0.03*tw,-0.005*th); projectorRuler.offsetPos = new PVector(0.03*pw,-0.005*ph);
+  tabletRuler.offsetPos = new PVector(-0.03*tw,0); projectorRuler.offsetPos = new PVector(-0.03*pw,0);
                                           
   tabletRuler.components = new RulerAppend[]{new RulerAppend(tw*0.1,0,"ChallengeMode/HandsOff.png",-0.05*tw,-0.2*th),
                                               new RulerAppend(tw*0.1,0,"ChallengeMode/check.png",-0.05*tw,-0.2*th),
@@ -194,11 +194,11 @@ class Ruler{
   
   
   private PImage getDrawImg(float len){
-    return shapes.fetch(rulerImg.height*len);
-//    if(shapes.index>=0)return shapes.fetch(rulerImg.height*len);
-//    int x = Math.round(rulerImg.height*(1-len));
-//    int y = Math.round(rulerImg.height*len);
-//    return rulerImg.get(0,x,rulerImg.width,y);
+    //return shapes.fetch(rulerImg.height*len);
+    if(shapes.index>=0)return shapes.fetch(rulerImg.height*len);
+    int x = Math.round(rulerImg.height*(1-len));
+    int y = Math.round(rulerImg.height*len);
+    return rulerImg.get(0,x,rulerImg.width,y);
   }
   
   public Ruler(PApplet a,int w,int h,String add,float x,float y,String[] L){
@@ -215,7 +215,7 @@ class Ruler{
   }
   
   public void drawMe(){
-    if(rulerOn)delegate.image(drawImg,curPos.x + offsetPos.x, curPos.y + offsetPos.y);
+    if(rulerOn && drawImg!=null)delegate.image(drawImg,curPos.x + offsetPos.x, curPos.y + offsetPos.y);
     if(components != null){
       for(int i=0; i<components.length; i++){
         components[i].drawMe(delegate,appendPos);
@@ -231,13 +231,13 @@ class Ruler{
   
   public void updatePos(float leftmost, float rightmost, float top, float bottom){
     
-    curPos.x = rightmost ;
+    curPos.x = leftmost - drawImg.width ;
     curPos.y = bottom - drawImg.height;
     appendPos.x = (leftmost+rightmost)/2;
     appendPos.y = top;
     
     if(curPos.y < 30){
-      curPos.x = defaultPos.x;
+      curPos.x = defaultPos.x - drawImg.width;
       curPos.y = defaultPos.y - drawImg.height;
     }
     
@@ -310,7 +310,7 @@ public class RulerShape{
   
   
   public void choose(int i){
-    if(i>=0 && i<imgs.length){
+    if(i<imgs.length){
       index = i;
     }
   }
