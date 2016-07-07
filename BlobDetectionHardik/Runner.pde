@@ -130,6 +130,9 @@ ChallengeLogic challengelogic;
 //Global Variable
 HarryGlobalClass HarryGlobal;
 
+//Compete Mode
+CompeteLogic competelogic;
+
 
 
 public void setup(){
@@ -209,14 +212,14 @@ public void setup(){
   
   
   challengelogic = new ChallengeLogic();
-  
+  competelogic = new CompeteLogic();
   setupHomeScene();
   
   frameRate(25);
   
   SetupAlready = true;
   
-  commonDelay();
+  freezeTouch(2000);
 }
 
 public long lastF = 0;
@@ -240,47 +243,47 @@ public void draw()
   //println("FPS: " + 1000/(ttttt-lastF));
   lastF = ttttt;
   
- 
-  currentScenario = scenarioList[currentScenarioIndex];  
- 
-  t[0] = currentScenario.tower1;
-  t[1] = currentScenario.tower2;
-  towerengine.content = t;
- 
-  
-  
-  
-  bd = getBlobScannerObject(bd,srcImage);
-  
-  IndexArray = getNum_getIndex (bd);
-  
-   //getNum_getIndex does not currently return the num.
-  towerIndices = IndexArray.array();
-  
-  if( towers != null)
-    towers.clear();
-  
-  if(towerIndex != null)
-    towerIndex.clear();
-  
-  
-  for(int i = 0; i < towerIndices.length; i++) 
-  {
-    
-    String[] towerInfo = getTowerName(bd,towerIndices[i]);
-    String  FTowerLabel;
-    if(towerInfo[1].equals("right"))
-      FTowerLabel= getTowerName(bd,towerIndices[i])[0];
-    else
-      FTowerLabel = "WrongOrientation";
-    if(bd.getD()[towerIndices[i]].y > HarryGlobal.groundThreshold)
-    {
-      towers.add(FTowerLabel.substring(0,2));
-      towerIndex.add(towerIndices[i]);
-    }
-    
+  if(gs != GameState.COMPETE){
+      currentScenario = scenarioList[currentScenarioIndex];  
+     
+      t[0] = currentScenario.tower1;
+      t[1] = currentScenario.tower2;
+      towerengine.content = t;
+     
+      
+      
+      
+      bd = getBlobScannerObject(bd,srcImage);
+      GameUnAttended();
+      IndexArray = getNum_getIndex (bd);
+      
+       //getNum_getIndex does not currently return the num.
+      towerIndices = IndexArray.array();
+      
+      if( towers != null)
+        towers.clear();
+      
+      if(towerIndex != null)
+        towerIndex.clear();
+      
+      
+      for(int i = 0; i < towerIndices.length; i++) 
+      {
+        
+        String[] towerInfo = getTowerName(bd,towerIndices[i]);
+        String  FTowerLabel;
+        if(towerInfo[1].equals("right"))
+          FTowerLabel= getTowerName(bd,towerIndices[i])[0];
+        else
+          FTowerLabel = "WrongOrientation";
+        if(bd.getD()[towerIndices[i]].y > HarryGlobal.groundThreshold)
+        {
+          towers.add(FTowerLabel.substring(0,2));
+          towerIndex.add(towerIndices[i]);
+        }
+        
+      }
   }
-  
   
   
   
@@ -295,6 +298,9 @@ public void draw()
     case CHALLENGE:
     challengelogic.play();
     challengelogic.UI.drawChallengeTablet();
+    break;
+    
+    case COMPETE:
     break;
     
     
@@ -1243,7 +1249,7 @@ public void draw()
     break;
   }
   
-  GameUnAttended();
+  
 }
 
 
@@ -1320,4 +1326,13 @@ public void GameUnAttended(){
   }
 }
 
+public void freezeTouch(int len){
+  untouchable = true;
+  Timer timer = new Timer();
+  timer.schedule(new TimerTask(){
+    public void run(){
+      untouchable = false;
+    }
+  },len);  
+}
 
