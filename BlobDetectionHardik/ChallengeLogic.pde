@@ -45,7 +45,7 @@ class ChallengeControl{
     
         if(father.noRuler && CHALLENGE_MODE_ON){
           father.noRuler=false;
-          father.rulerEngine.turnOnRulers();
+          father.rulerEngine.turnRulers(true);
         }
     
   }
@@ -132,6 +132,8 @@ class ChallengeLogic{
   
   void switchIn(){
     cs = ChallengeMyTowerState.INITIAL;
+    rulerEngine.turnRulers(false);
+    rulerEngine.changeRulerShape(-1);
     towerOK = false;
      shakedTimeText = "";
      trials = 0;

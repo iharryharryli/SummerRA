@@ -267,8 +267,8 @@ class RulerEngine{
     rulers[i].drawMe();
   }
   
-  public void turnOnRulers(){
-    for(int i=0; i<rulers.length; i++)rulers[i].rulerOn = true;
+  public void turnRulers(boolean on){
+    for(int i=0; i<rulers.length; i++)rulers[i].rulerOn = on;
   }
   
   public void updateRuler(int i, float a, float b, float c, float d){
@@ -278,7 +278,6 @@ class RulerEngine{
   public void measureTower(float someY){
      tallEnough = rulers[target].measure(someY);
      
-     //println(tallEnough);
   }
   
   public void resizeByHeight(float h){
