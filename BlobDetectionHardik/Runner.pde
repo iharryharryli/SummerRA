@@ -1,6 +1,6 @@
 //Debug Purpose
 boolean CHALLENGE_MODE_ON = false;
-int DISPLAY_ARRANGEMENT = 1;  // 0 for debug, 1 for projector 
+int DISPLAY_ARRANGEMENT = 0;  // 0 for debug, 1 for projector 
 public int projectorWidth = 1920;
 public int projectorHeight = 1080; 
 public boolean FULL_SCREEN_MODE = false;
@@ -59,9 +59,9 @@ int rightTowerRight = 415;
 long shakingTimeout = 0;
 long startTime;
 long fallTime;
-long gameTimeout = System.currentTimeMillis();
+long gameTimeout;
 long handsOffTimeout;
-int  oldNumBlobs;
+int oldNumBlobs = -1;
 String shakeTime = "";
 float elapsedTime = 0.0;
 boolean tmtStood = false;
@@ -212,6 +212,8 @@ public void setup(){
   
   setupHomeScene();
   
+  frameRate(25);
+  
   SetupAlready = true;
   
   commonDelay();
@@ -249,6 +251,7 @@ public void draw()
   
   
   bd = getBlobScannerObject(bd,srcImage);
+  
   IndexArray = getNum_getIndex (bd);
   
    //getNum_getIndex does not currently return the num.
@@ -1240,21 +1243,7 @@ public void draw()
     break;
   }
   
-  
-  
-  if(!(bd.getBlobsNumber() == oldNumBlobs))
-  {
-    gameTimeout = System.currentTimeMillis() + 120000;
-    oldNumBlobs = bd.getBlobsNumber();
-  }
-  
-  if(System.currentTimeMillis() > gameTimeout)
-  {
-  //  gs = GameState.MAIN_MENU;
-    //ShuffleArray(scenarioList);
-  //  println("Game Timed out");
-  //  output.println("New user started the game");
-  }
+  GameUnAttended();
 }
 
 
@@ -1268,7 +1257,6 @@ public void drawContours()
 //mouseClicked() is called after draw(), it is not an interrupt.
 public void mouseClicked()
 {
-  gameTimeout = System.currentTimeMillis() + 120000;
 
   //not checking for correctness of tower since that is done in the main game loop
   if(ms == MainGameState.FALL_PREDICTION && guessed == false)
@@ -1298,8 +1286,8 @@ void drawCon()
   image(pgKinectTablet,0,0);
 }
  
- ArrayList<Contour> getContours()
- {
+ArrayList<Contour> getContours()
+{
    //Find all contours in input image
   
     
@@ -1318,7 +1306,18 @@ void drawCon()
    //translate(780,0);
   
    return filteredContours;
- }
- 
-  
+}
+
+public void GameUnAttended(){
+  int t = bd.getBlobsNumber();
+  if( t != oldNumBlobs){
+    oldNumBlobs = t;
+    gameTimeout = System.currentTimeMillis() + 120000;
+  }
+  if(System.currentTimeMillis() > gameTimeout){
+    backButtonClick(null,null);
+    oldNumBlobs = -1;
+  }
+}
+
 
