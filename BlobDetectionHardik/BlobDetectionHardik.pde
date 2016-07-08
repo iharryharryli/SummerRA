@@ -95,6 +95,7 @@ float[] calculateMoI(Detector blobs, int blobNumber){
 }
 
 float[] getBlobEigen(Detector Towers, int Blobnumber){
+  
   PVector[] V1 = Towers.getBlobPixelsLocation(Blobnumber);
   
   PVector[] cornerA = Towers.getA();// top left corner of the blob

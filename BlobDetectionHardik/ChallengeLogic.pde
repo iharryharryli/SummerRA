@@ -36,6 +36,7 @@ class ChallengeControl{
   
   public void transition(){
     father.cs = ChallengeMyTowerState.TRANSITION;
+    father.audio.play(5);
     uiengine.turnBtn(new int[]{1,2},true);
     uiengine.turnBtn(new int[]{6},false);
   }
@@ -97,6 +98,7 @@ class ChallengeLogic{
   
   boolean towerOK;
   
+  int fallenCount;
   
   private long startCheckingTimeout;
  
@@ -214,7 +216,7 @@ class ChallengeLogic{
      
       
       case ENOUGH:
-      
+      fallenCount = 0;
       HarryGlobal.canRegisterHeight = true;
       
       
@@ -282,14 +284,14 @@ class ChallengeLogic{
       
       leftFallingHeight = towerFallingHeight(bd,towerIndex.get(0),leftHeight);
       leftFallingAngle = towerFallingAngle(bd,towerIndex.get(0),leftAngle,leftDensity);
-      leftFallingMoI = towerFallingMoI(bd,towerIndex.get(0),leftMoIx,leftMoIy);
-      println(leftFallingMoI);
-//      leftFallingAngle2 = "Standing";
-//      leftFallingDensity = "Standing";
+      //leftFallingMoI = towerFallingMoI(bd,towerIndex.get(0),leftMoIx,leftMoIy); // for later use
+      //println(leftFallingMoI);
+
       
       leftFalling = towerFallingFinalDecision(leftFallingHeight, leftFallingAngle);
-      
-      if (leftFalling == "Fallen")
+      if (leftFalling == "Fallen")fallenCount++;
+      else fallenCount = 0;
+      if (fallenCount > HarryGlobal.fallenCountThreshold)
       {
         fallen = "tmtFell";
         fallTime = currTime - startTime;
@@ -360,7 +362,9 @@ class ChallengeLogic{
      cs = ChallengeMyTowerState.PLACING_TOWER;
      startCheckingTimeout = System.currentTimeMillis() + 1000;
      audio.cleanUp();
-     if(noRuler)audio.play(1);
+     if(trials==0){
+       if(noRuler)audio.play(1);
+     }
    }
    
    public void destroy(){

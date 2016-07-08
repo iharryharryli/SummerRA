@@ -301,6 +301,7 @@ public void win_draw1(GWinApplet appc, GWinData data) {
       break;
    
     case COMPETE:
+      competelogic.render(1);
       break;
   }
 } 

@@ -50,36 +50,7 @@ void CleanKinectData()
   int depthMapSize = context.depthMapSize();
   int depthImgWidth = context.depthWidth();
   int depthImgHeight = depthMapSize / depthImgWidth;
-  
-  //Remove erroneous pixels
-//  for (int i=0; i<depthMapSize;i++)
-//  {
-//    if (inputDepthMap[i] == 0) //Error depth map value 
-//      context.depthImage().pixels[i] = color(0,0,0); 
-//
-//    if ((inputDepthMap[i]< depthMin) || (inputDepthMap[i] > depthMax))  //Irrelevant depths
-//      context.depthImage().pixels[i] = color(0,0,0);
-//  }
-//  
-//  
-//  // The below code clears out objects that are to the left and right of the table
-//  for (int i=0;i<leftThreshold;i++)
-//  {
-//    for (int j=0;j<depthImgHeight;j++)
-//      context.depthImage().pixels[i+j*context.depthWidth()] = color(0,0,0);
-//  }
-//  
-//  for (int i =rightThreshold;i < depthImgWidth;i++)
-//  {
-//    for (int j=0;j<depthImgHeight;j++)
-//      context.depthImage().pixels[i+j*context.depthWidth()] = color(0,0,0);
-//  }
-//  
-//  for (int i = leftThreshold ; i < rightThreshold ; i++){
-//    for (int j = 0 ; j < topThreshold ; j++){
-//      context.depthImage().pixels[i+j*context.depthWidth()] = color(0,0,0);
-//    }  
-//  }
+
   
   for(int i = 0 ; i < depthImgWidth ; i++){
     for (int j = 0 ; j < depthImgHeight ; j++){

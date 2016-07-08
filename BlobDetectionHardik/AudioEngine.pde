@@ -1,9 +1,19 @@
+public void setupAudio(){
+   AudioEngine e = new AudioEngine();
+   e.addToEngine(new Object[]{
+           0,"Assets/audio/clear_table.wav",
+           1,"Assets/audio/testmytower_prompt.wav",
+           2,"Assets/audio/testmytower_toomanytowers.wav",
+           3,"Assets/audio/testmytower_standing.wav",
+           4,"Assets/audio/testmytower_fell.wav",   
+           5,"Assets/audio/transition_to_game.wav", 
+           
+   });
+   HarryGlobal.audioEngine = e;
+}
+
 public class AudioEngine{
   HashMap search;
-  
- 
-  
-  
   int lastPlayed = -1;
   
   
@@ -45,6 +55,7 @@ public class AudioEngine{
   }
   
   public void shutUp(){
+    aplayer.close();
     if(player!=null)player.pause();
   }
   
@@ -63,16 +74,6 @@ public class AudioEngine{
   }
 }
 
-public void setupAudio(){
-   AudioEngine e = new AudioEngine();
-   e.addToEngine(new Object[]{
-           0,"Assets/audio/clear_table.wav",
-           1,"Assets/audio/testmytower_prompt.wav",
-           2,"Assets/audio/testmytower_toomanytowers.wav",
-           3,"Assets/audio/testmytower_standing.wav",
-           4,"Assets/audio/testmytower_fell.wav",           
-   });
-   HarryGlobal.audioEngine = e;
-}
+
 
 
