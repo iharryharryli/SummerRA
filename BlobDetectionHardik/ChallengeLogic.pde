@@ -197,7 +197,16 @@ class ChallengeLogic{
      case PLACING_TOWER:
       
       if(noRuler)textengine.changeText(31);
-      else textengine.changeText(39);
+      else {
+        int textID;
+        if(challengeReceived == 2)textID = 39;
+        else if(challengeReceived < 5)textID = 42;
+        else if(challengeReceived  == 5)textID = 43;
+        else textID = 44;
+        textengine.changeText(textID);
+      }
+      
+      
       towerChecking();
       indicateTowerState(rulerEngine,-1);
       break;
@@ -364,6 +373,14 @@ class ChallengeLogic{
      audio.cleanUp();
      if(trials==0){
        if(noRuler)audio.play(1);
+       else{
+         int audioID;
+         if(challengeReceived == 2)audioID = 6;
+          else if(challengeReceived < 5)audioID = 7;
+          else if(challengeReceived  == 5)audioID = 8;
+          else audioID = 9;
+         audio.play(audioID);
+       }
      }
    }
    

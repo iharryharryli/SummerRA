@@ -3,11 +3,14 @@ public void setupAudio(){
    e.addToEngine(new Object[]{
            0,"Assets/audio/clear_table.wav",
            1,"Assets/audio/testmytower_prompt.wav",
-           2,"Assets/audio/testmytower_toomanytowers.wav",
+           2,"ChallengeMode/audio/make_sure_only_one_tower.wav",
            3,"Assets/audio/testmytower_standing.wav",
            4,"Assets/audio/testmytower_fell.wav",   
            5,"Assets/audio/transition_to_game.wav", 
-           
+           6,"ChallengeMode/audio/taller_than_ruler.wav",
+           7,"ChallengeMode/audio/taller_than_house.wav",
+           8,"ChallengeMode/audio/taller_than_building.wav",
+           9,"ChallengeMode/audio/taller_than_eiffel_tower.wav",
    });
    HarryGlobal.audioEngine = e;
 }

@@ -533,6 +533,9 @@ public void createGUI(){
                    "ChallengeMode/text/prompt.png", 
                    "ChallengeMode/text/handsoff.png", //40
                    "ChallengeMode/text/goodjob.png", 
+                   "ChallengeMode/text/taller_than_house.png",
+                   "ChallengeMode/text/taller_than_building.png",
+                   "ChallengeMode/text/taller_than_eiffel_tower.png",
                    
                  },0,0,1,0.358,0.2,0.02,0.8,0.28,100);
                  

@@ -36,6 +36,9 @@ public class SideController{
   
   public int checkFalling(){
     for(int i=0; i<sides.length; i++){
+      if(sides[i].tower_num < 1)return i;
+    }
+    for(int i=0; i<sides.length; i++){
       if(sides[i].isFallen(detector)){
         return i;
       }
