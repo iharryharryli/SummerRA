@@ -428,7 +428,7 @@ public void createGUI(){
       new UIButton(new int[]{0},4,this,new String[]{"ui_elements/shake_btn.png"},0.35,0.82,0.3,0.17,"shakeClick"),
       new UIButton(new int[]{1},4,this,new String[]{"ui_elements/shake_btn.png"},0.55,0.83,0.26,0.14,"shakeClick"),
       new UIButton(new int[]{0},6,this,new String[]{"ui_elements/home_button.png"},0.83,0.8,0.13,0.17,"backButtonClick"),
-      new UIButton(new int[]{1},6,this,new String[]{"ui_elements/home_button.png"},0.87,0.83,0.13,0.17,"backButtonClick"),
+    //  new UIButton(new int[]{1},6,this,new String[]{"ui_elements/home_button.png"},0.87,0.83,0.001,0.01,"backButtonClick"),
       
       new UIButton(new int[]{0},12,this,new String[]{"ui_elements/tower_first.png"},0.27,0.27,www,hhh,"predictTower1Click"),
       new UIButton(new int[]{0},13,this,new String[]{"ui_elements/tower_second.png"},0.53,0.27,www,hhh,"predictTower2Click"),

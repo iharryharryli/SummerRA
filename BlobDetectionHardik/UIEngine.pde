@@ -306,7 +306,7 @@ class UIEngine{
       for(int j=0; j<stuff.length; j++){
         if(stuff[j] instanceof GImageButton){
           GImageButton temp = (GImageButton) stuff[j];
-          temp.setVisible(isOn);
+          if(temp!=null)temp.setVisible(isOn);
         }
       }
     }
@@ -317,7 +317,7 @@ class UIEngine{
        Object[] stuff = (Object[])(searchUp.get(s[i]));
        for(int j=0; j<stuff.length; j++){
          GImageButton temp = (GImageButton) stuff[j];
-         temp.setVisible(on);
+         if(temp!=null)temp.setVisible(on);
        }
      }
    }

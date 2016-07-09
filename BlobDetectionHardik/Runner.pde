@@ -4,7 +4,7 @@ boolean COMPETE_MODE_ON = false;
 int DISPLAY_ARRANGEMENT = 1;  // 0 for debug, 1 for projector 
 public int projectorWidth = 1920;
 public int projectorHeight = 1080; 
-public boolean FULL_SCREEN_MODE = true;
+public boolean FULL_SCREEN_MODE = false;
 public boolean PLAY_INSTRUCTION_EVERY_TRIAL = false;
 
 
@@ -214,7 +214,7 @@ public void setup(){
   
   
   challengelogic = new ChallengeLogic();
-  competelogic = new CompeteLogic();
+  if(COMPETE_MODE_ON)competelogic = new CompeteLogic();
   setupHomeScene();
   
   frameRate(25);
@@ -229,21 +229,20 @@ public long lastF = 0;
 
 
 public void detection(){
+  
   Image_filtering();
   Timer timer = new Timer();
   timer.schedule(new TimerTask(){
     public void run(){
       detection();
     }
-  },10);  
+  },1);  
   
 }
 
 public void draw()
 {
-  long ttttt = System.currentTimeMillis();
-  //println("FPS: " + 1000/(ttttt-lastF));
-  lastF = ttttt;
+ 
   
   if(gs == GameState.CHALLENGE || gs == GameState.MAIN_GAME){
       currentScenario = scenarioList[currentScenarioIndex];  

@@ -10,7 +10,7 @@ public class HarryGlobalClass{
   
   public int minimumBlobSize = 1000;
   
-  public int fallenCountThreshold = 10;
+  public int fallenCountThreshold = 5;
   
   public DrawKinect kinectDrawer;
   
