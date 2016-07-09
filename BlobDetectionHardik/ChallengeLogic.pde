@@ -269,10 +269,15 @@ class ChallengeLogic{
       if(shakingTimeout < currTime)
       {
         fallTime = 5000;
-        cs = ChallengeMyTowerState.SUCCESS;  
+          
         relayOff();
+        
+        //shakingTimeout = System.currentTimeMillis() + 5000;
+      }
+      
+      if(shakingTimeout + 1000 < currTime){
+        cs = ChallengeMyTowerState.SUCCESS;
         println("SHAKING -> SUCCESS");
-        shakingTimeout = System.currentTimeMillis() + 5000;
       }
       
       if(towerIndex.size() < 1)
@@ -371,7 +376,7 @@ class ChallengeLogic{
      cs = ChallengeMyTowerState.PLACING_TOWER;
      startCheckingTimeout = System.currentTimeMillis() + 1000;
      audio.cleanUp();
-     if(trials==0){
+     if(trials==0 && !PLAY_INSTRUCTION_EVERY_TRIAL){
        if(noRuler)audio.play(1);
        else{
          int audioID;

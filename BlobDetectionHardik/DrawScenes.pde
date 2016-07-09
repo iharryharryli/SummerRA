@@ -17,7 +17,7 @@ public void drawMainMenuCore(int screenID){
   
   //draw backgrounds
   if(ms == MainGameState.TRANSITION){
-    uiengine.switchOn(new int[]{2,28});
+    
     uiengine.drawConstants(screenID,new int[]{5,0,27});
   }
   else{

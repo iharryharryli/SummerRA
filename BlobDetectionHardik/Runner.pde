@@ -1,10 +1,11 @@
 //Debug Purpose
-boolean CHALLENGE_MODE_ON = true;
-boolean COMPETE_MODE_ON = true;
-int DISPLAY_ARRANGEMENT = 0;  // 0 for debug, 1 for projector 
+boolean CHALLENGE_MODE_ON = false;
+boolean COMPETE_MODE_ON = false;
+int DISPLAY_ARRANGEMENT = 1;  // 0 for debug, 1 for projector 
 public int projectorWidth = 1920;
 public int projectorHeight = 1080; 
-public boolean FULL_SCREEN_MODE = false;
+public boolean FULL_SCREEN_MODE = true;
+public boolean PLAY_INSTRUCTION_EVERY_TRIAL = false;
 
 
 // Need G4P library
@@ -234,7 +235,7 @@ public void detection(){
     public void run(){
       detection();
     }
-  },120);  
+  },10);  
   
 }
 
@@ -1194,6 +1195,7 @@ public void draw()
         if(transitionCounter >= 3)
         {
           ms = MainGameState.TRANSITION;
+          uiengine.switchOn(new int[]{2,28});
           transitionCounter = 0;
         }
         
