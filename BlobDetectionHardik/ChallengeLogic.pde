@@ -352,21 +352,22 @@ class ChallengeLogic{
       
       case SETUP:
       
-     
+      challengeReceived ++;
       
       float newChallengeDelta = 15;
       trials = 0;   
       
       
-      
-      if(noRuler)rulerEngine.resizeByHeight(0.01);
+      if(noRuler)rulerEngine.resizeByHeight(0.1);
       else {
-        float temp = HarryGlobal.towerHeightInPixel + newChallengeDelta;
-        if(temp < 80)temp = 80;
-        rulerEngine.resizeByHeight(temp);
+        float newHeight = HarryGlobal.towerHeightInPixel + newChallengeDelta;
+        if(newHeight < HarryGlobal.minimumHeightForChallenge)newHeight = HarryGlobal.minimumHeightForChallenge;
+        if(newHeight > HarryGlobal.heightLimitForHouse && challengeReceived < 5 && challengeReceived > 2) challengeReceived = 5;
+        rulerEngine.changeRulerShape(challengeReceived-3);
+        rulerEngine.resizeByHeight(newHeight);
       }
-      challengeReceived ++;   
-      rulerEngine.changeRulerShape(challengeReceived-2);
+      
+      
       gotoMain();
       
       break;

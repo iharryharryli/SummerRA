@@ -1,7 +1,7 @@
 //Debug Purpose
-boolean CHALLENGE_MODE_ON = false;
+boolean CHALLENGE_MODE_ON = true;
 boolean COMPETE_MODE_ON = false;
-int DISPLAY_ARRANGEMENT = 1;  // 0 for debug, 1 for projector 
+int DISPLAY_ARRANGEMENT = 0;  // 0 for debug, 1 for projector 
 public int projectorWidth = 1920;
 public int projectorHeight = 1080; 
 public boolean FULL_SCREEN_MODE = false;
