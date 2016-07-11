@@ -12,9 +12,9 @@ public class HarryGlobalClass{
   
   public int fallenCountThreshold = 8;
   
-  public int heightLimitForHouse = 140;
+  public int heightLimitForHouse = 230;
   
-  public int minimumHeightForChallenge = 75;
+  public int minimumHeightForChallenge = 80;
   
   public DrawKinect kinectDrawer;
   

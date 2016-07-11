@@ -1,6 +1,6 @@
 //Debug Purpose
 boolean CHALLENGE_MODE_ON = true;
-boolean COMPETE_MODE_ON = false;
+boolean COMPETE_MODE_ON = true;
 int DISPLAY_ARRANGEMENT = 0;  // 0 for debug, 1 for projector 
 public int projectorWidth = 1920;
 public int projectorHeight = 1080; 
@@ -215,13 +215,21 @@ public void setup(){
   
   challengelogic = new ChallengeLogic();
   if(COMPETE_MODE_ON)competelogic = new CompeteLogic();
-  setupHomeScene();
+  
   
   frameRate(25);
   
-  SetupAlready = true;
+  Timer timer = new Timer();
+  timer.schedule(new TimerTask(){
+    public void run(){
+      setupHomeScene();
+      SetupAlready = true;
+    }
+  },3000);  
   
-  freezeTouch(4000);
+  
+  
+  
 }
 
 public long lastF = 0;
