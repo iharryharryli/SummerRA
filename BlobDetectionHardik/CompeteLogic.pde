@@ -104,6 +104,7 @@ public class CompeteLogic{
   CompeteAction nextAction;
   RelayControl myRelay;
   CompeteInput userInput;
+  CompeteUI UI;
  
   public CompeteLogic(){
     detector = bd;
@@ -114,7 +115,7 @@ public class CompeteLogic{
     
     stateID = -1;
     userInput = new CompeteInput(this);
-    
+    UI = new CompeteUI();
   }
   
   public void main(){
@@ -141,13 +142,14 @@ public class CompeteLogic{
   
   public void play(){
     if(!isPlaying)return;
+    
     detection();
     if(nextAction!=null){
       nextAction.run();
       nextAction = null;
     }
     main();
-    
+    UI.stateID = stateID;
     Timer timer = new Timer();
     timer.schedule(new TimerTask(){
       public void run(){

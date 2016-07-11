@@ -373,7 +373,7 @@ public void createGUI(){
 
   
   uiengine = new UIEngine(new UIScreen[]{s1,s2});
-  
+  tabletDrawDelegate = this;
   projectorDrawDelegate = window1.papplet;
   setupRulers();
   

@@ -120,6 +120,7 @@ int[] TestMyTowerStages = null;
 boolean TestMyTowerIsDrawingKinect = false;
 PImage loadingPage;
 PGraphics pgKinectTablet,pgKinectProjector;
+PApplet tabletDrawDelegate;
 PApplet projectorDrawDelegate;
 boolean untouchable = false;
 
@@ -208,7 +209,7 @@ public void setup(){
    //setup detection 
    detection();
   
-  println("done with setup");
+  
   logger.logging(0,new String[]{"Setup Successful"});
   logger.logging(1,new String[]{"Anon Student Id\t Session Id\t Time\t Time Zone\t Student Response Type\t  Tutor Response Type\t  Selection\t  Level(Unit)\t  Level(Section)\t Attempt At Step\t Problem Name\t  Step Name\t  Action\t Input\t   Outcome\t    Feedback Text\t Feedback Classification\t  Condition Name\t  Condition Type\t  KC(Default)\t  KC Category(Default)\t  School\t Class"});
   
@@ -222,6 +223,7 @@ public void setup(){
   Timer timer = new Timer();
   timer.schedule(new TimerTask(){
     public void run(){
+      println("done with setup");
       setupHomeScene();
       SetupAlready = true;
     }
