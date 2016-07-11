@@ -100,7 +100,7 @@ void checkRelayStatus(){
       myPort.clear();
       myPort.stop();
       //myPort = null ;
-      delay(3000);
+      delay(300);
       relaySetup();
       relayOff();
     }
