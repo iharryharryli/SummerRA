@@ -347,8 +347,13 @@ class ChallengeLogic{
       
       case SETUP:
       
+     
+      
       float newChallengeDelta = 15;
       trials = 0;   
+      
+      
+      
       if(noRuler)rulerEngine.resizeByHeight(0.01);
       else {
         float temp = HarryGlobal.towerHeightInPixel + newChallengeDelta;

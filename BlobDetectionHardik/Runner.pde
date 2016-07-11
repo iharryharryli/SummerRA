@@ -221,7 +221,7 @@ public void setup(){
   
   SetupAlready = true;
   
-  freezeTouch(2000);
+  freezeTouch(4000);
 }
 
 public long lastF = 0;

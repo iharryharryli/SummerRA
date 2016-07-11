@@ -317,10 +317,10 @@ public class RulerShape{
   
   public PImage fetch(float h){
     int hh = (int)h;
-    if(hh==0)hh=2;
     
     PImage res = imgs[index].get();
-    res.resize(0,hh);
+    if(hh == 0)res.resize(1,1);
+    else res.resize(0,hh);
     
     return res;
   }
