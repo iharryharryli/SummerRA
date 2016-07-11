@@ -102,7 +102,7 @@ class ChallengeLogic{
   
   private long startCheckingTimeout;
  
-  
+  private long shakeDelay = -1;
   
   int trials;
   
@@ -157,6 +157,7 @@ class ChallengeLogic{
  }
  
  private void towerChecking(){
+   shakeDelay = -1;
    if(System.currentTimeMillis() < startCheckingTimeout)return;
    if(towers.size() <= 1)
       {
@@ -232,15 +233,19 @@ class ChallengeLogic{
       long currentT = System.currentTimeMillis();
       
       if(assureValid()){
-        
-          indicateTowerState(rulerEngine,1);
-          uiengine.turnBtn(new int[]{4},true);
+          if(shakeDelay == -1){
+            shakeDelay = currentT + 500;
+          }
+          else if(currentT > shakeDelay){
+            indicateTowerState(rulerEngine,1);
+            uiengine.turnBtn(new int[]{4},true);
+          }
 //          if(noRuler) textengine.changeText(31);
 //          else textengine.changeText(36);
         
       }
       else{
-        
+        shakeDelay = -1;
         uiengine.turnBtn(new int[]{4},false);
           cs = ChallengeMyTowerState.PLACING_TOWER;
       }

@@ -1191,7 +1191,9 @@ public void draw()
       {
         handsOffTimeout = System.currentTimeMillis() + 40000;
         currentScenarioIndex = (currentScenarioIndex+1)%scenarioList.length;
-        if(transitionCounter >= 3)
+        //if(transitionCounter >= 3)
+        //for reporter version
+        if(transitionCounter >= 2)
         {
           ms = MainGameState.TRANSITION;
           uiengine.switchOn(new int[]{2,28});

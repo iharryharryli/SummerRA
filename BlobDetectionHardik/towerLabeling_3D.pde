@@ -6,7 +6,7 @@
 
 String[] towerLabeling_3D(float xMoi,float yMoiTop,float yMoiBottom,float towerWidth)
 {
-  float thresholdMOI = 7;
+  float thresholdMOI = 15;
   String towerName;
 
 //  float[] NtowersX = {2170,2660,2380,2260,1210,1410,860,925,1020,1020,1570,1685,1975,1715,1640,1665,1065,1240,1875,2270};
@@ -45,10 +45,12 @@ String[] towerLabeling_3D(float xMoi,float yMoiTop,float yMoiBottom,float towerW
 
   float referenceAbsoluteValue = sqrt(absolutediff[minIndex]*100*100/(NtowersX[minIndex]*NtowersX[minIndex] + NtowersYBottom[minIndex]*NtowersYBottom[minIndex] +NtowersYTop[minIndex]*NtowersYTop[minIndex]));
 
-  //  println(referenceAbsoluteValue);
-
-  if (NtowerNames[minIndex].equals("D4close")) 
-    thresholdMOI = 12;
+  println(referenceAbsoluteValue);
+  
+ 
+  
+//  if (NtowerNames[minIndex].equals("D4close")) 
+//    thresholdMOI = 12;
 
   if (referenceAbsoluteValue > thresholdMOI)
   {

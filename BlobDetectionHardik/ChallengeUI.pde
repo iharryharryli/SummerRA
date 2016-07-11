@@ -230,7 +230,7 @@ class Ruler{
   }
   
   public void updatePos(float leftmost, float rightmost, float top, float bottom){
-    
+    if(drawImg == null) return;
     curPos.x = leftmost - drawImg.width ;
     curPos.y = bottom - drawImg.height;
     appendPos.x = (leftmost+rightmost)/2;
@@ -319,7 +319,7 @@ public class RulerShape{
     int hh = (int)h;
     
     PImage res = imgs[index].get();
-    if(hh == 0)res.resize(1,1);
+    if(hh < 8)res.resize(1,1);
     else res.resize(0,hh);
     
     return res;
