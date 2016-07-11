@@ -220,14 +220,16 @@ public void setup(){
   
   frameRate(25);
   
+  
   Timer timer = new Timer();
   timer.schedule(new TimerTask(){
     public void run(){
       println("done with setup");
       setupHomeScene();
       SetupAlready = true;
+      
     }
-  },3000);  
+  },2000);  
   
   
   
@@ -252,9 +254,9 @@ public void detection(){
 
 public void draw()
 {
- 
   
-  if(gs == GameState.CHALLENGE || gs == GameState.MAIN_GAME){
+  
+  if(gs == GameState.MAIN_MENU || gs == GameState.CHALLENGE || gs == GameState.MAIN_GAME){
       currentScenario = scenarioList[currentScenarioIndex];  
      
       t[0] = currentScenario.tower1;

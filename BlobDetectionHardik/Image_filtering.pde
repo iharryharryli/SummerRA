@@ -38,7 +38,7 @@ void CleanKinectData()
   int leftThreshold = 80;
   int rightThreshold = 550;
 //  int topThreshold = 145;
-  int topThreshold = -1;
+  int topThreshold = 480 - 95;
   
   int depthMin = 600; // This figure defines the mininum depth at which the kinect should look for objects. 
   //i.e this value will change if the table if moved w.r.t to the Kinect mounting position
@@ -60,7 +60,7 @@ void CleanKinectData()
         context.depthImage().pixels[i+j*depthImgWidth] = color(0,0,0);
       } else if (i < leftThreshold || i >= rightThreshold){
         context.depthImage().pixels[i+j*depthImgWidth] = color(0,0,0);
-      } else if (j < topThreshold){
+      } else if (j > topThreshold){
         context.depthImage().pixels[i+j*depthImgWidth] = color(0,0,0);
       } 
     }
