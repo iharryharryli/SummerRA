@@ -1,11 +1,12 @@
 //Debug Purpose
-boolean CHALLENGE_MODE_ON = false;
-boolean COMPETE_MODE_ON = false;
-int DISPLAY_ARRANGEMENT = 1;  // 0 for debug, 1 for projector 
+boolean CHALLENGE_MODE_ON = true;
+boolean COMPETE_MODE_ON = true;
+int DISPLAY_ARRANGEMENT = 0;  // 0 for debug, 1 for projector 
 public int projectorWidth = 1920;
 public int projectorHeight = 1080; 
-public boolean FULL_SCREEN_MODE = true;
+public boolean FULL_SCREEN_MODE = false;
 public boolean PLAY_INSTRUCTION_EVERY_TRIAL = false;
+public boolean LALALA = true;
 
 
 // Need G4P library
@@ -142,14 +143,16 @@ public void setup(){
   
   HarryGlobal = new HarryGlobalClass();
   
-  createGUI();
+  
   
   size(touchscreenWidth,touchscreenHeight, JAVA2D);
   
-  AudioSetup();
+  createGUI();
+  
+  //AudioSetup();
   
   //challengelogic = new ChallengeLogic(); //gameTimeout = System.currentTimeMillis() + 120000;
-  gs = GameState.MAIN_MENU;
+  //gs = GameState.MAIN_MENU;
   
   
   guessed = false;
@@ -216,13 +219,13 @@ public void setup(){
   logger.logging(1,new String[]{"Anon Student Id\t Session Id\t Time\t Time Zone\t Student Response Type\t  Tutor Response Type\t  Selection\t  Level(Unit)\t  Level(Section)\t Attempt At Step\t Problem Name\t  Step Name\t  Action\t Input\t   Outcome\t    Feedback Text\t Feedback Classification\t  Condition Name\t  Condition Type\t  KC(Default)\t  KC Category(Default)\t  School\t Class"});
   
   
-  challengelogic = new ChallengeLogic();
+  //challengelogic = new ChallengeLogic();
   if(COMPETE_MODE_ON)competelogic = new CompeteLogic();
-  
+  competelogic.startPlaying();
   
   frameRate(25);
   
-  
+  /*
   Timer timer = new Timer();
   timer.schedule(new TimerTask(){
     public void run(){
@@ -232,8 +235,8 @@ public void setup(){
       
     }
   },2000);  
-  
-  
+  */
+  SetupAlready = true;
   
   
 }

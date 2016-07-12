@@ -158,7 +158,6 @@ public class CompeteLogic{
     },updateInterval);
   }
   public void startPlaying(){
-    uiengine.switchOn(new int[]{});
     gs = GameState.COMPETE;
     isPlaying = true;
     play();

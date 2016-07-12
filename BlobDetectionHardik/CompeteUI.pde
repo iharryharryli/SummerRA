@@ -9,12 +9,12 @@ public class CompeteUI{
     /*
     UIElement IDs:
     0: background
-    
+    1: table
     */
     UIElement[] lib = new UIElement[] {
       
       new UIImage(new int[]{0,1},0,0,0,1,1,"CompeteMode/elements/background.png"),
-      new UIImage(new int[]{0,1},1,0.2,0.6,0.6,0.4,"CompeteMode/elements/table_with_circles.png"),
+      new UIImage(new int[]{0,1},1,0.23,0.55,0.54,0.45,"CompeteMode/elements/table_with_circles.png"),
       
     };
     

@@ -367,14 +367,17 @@ public void createGUI(){
  
   window1.setActionOnClose(G4P.EXIT_APP);
   window1.addDrawHandler(this, "win_draw1");
+  tabletDrawDelegate = this;
+  projectorDrawDelegate = window1.papplet;
+  
+  if(LALALA)return;
   
   UIScreen s1 = new UIScreen(this,new PVector(touchscreenWidth,touchscreenHeight),"AssetsTablet/");
   UIScreen s2 = new UIScreen(window1.papplet,new PVector(projectorWidth,projectorHeight),"AssetsProjector/");
 
   
   uiengine = new UIEngine(new UIScreen[]{s1,s2});
-  tabletDrawDelegate = this;
-  projectorDrawDelegate = window1.papplet;
+  
   setupRulers();
   
   /*
