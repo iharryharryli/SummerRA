@@ -158,6 +158,7 @@ public class CompeteLogic{
     },updateInterval);
   }
   public void startPlaying(){
+    uiengine.switchOn(new int[]{});
     gs = GameState.COMPETE;
     isPlaying = true;
     play();
@@ -179,7 +180,7 @@ public class CompeteLogic{
      controller.update(detector,filtered);
   }
   public void render(int screenID){
-    
+    UI.render(screenID);
   }
 }
 

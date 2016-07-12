@@ -1,10 +1,10 @@
 //Debug Purpose
-boolean CHALLENGE_MODE_ON = true;
-boolean COMPETE_MODE_ON = true;
-int DISPLAY_ARRANGEMENT = 0;  // 0 for debug, 1 for projector 
+boolean CHALLENGE_MODE_ON = false;
+boolean COMPETE_MODE_ON = false;
+int DISPLAY_ARRANGEMENT = 1;  // 0 for debug, 1 for projector 
 public int projectorWidth = 1920;
 public int projectorHeight = 1080; 
-public boolean FULL_SCREEN_MODE = false;
+public boolean FULL_SCREEN_MODE = true;
 public boolean PLAY_INSTRUCTION_EVERY_TRIAL = false;
 
 
@@ -169,11 +169,13 @@ public void setup(){
   leftTower.add("notPlaced");
   leftTower.add("notPlaced");
   leftTower.add("notPlaced");
+  
  
   rightTower = new ArrayList<String>();
   rightTower.add("notPlaced");
   rightTower.add("notPlaced");
   rightTower.add("notPlaced");
+  
  
   towers     = new ArrayList();
   towerIndex = new ArrayList();
