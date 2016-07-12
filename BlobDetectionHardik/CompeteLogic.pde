@@ -158,6 +158,8 @@ public class CompeteLogic{
     },updateInterval);
   }
   public void startPlaying(){
+    HarryGlobal.kinectDrawDelegate = null;
+    HarryGlobal.kinectDrawDelegate = new KinectDrawingForCompete(this);
     gs = GameState.COMPETE;
     isPlaying = true;
     play();
