@@ -7,3 +7,7 @@ void keyPressed(){
     competelogic.userInput.shake();
   }
 }
+
+void mousePressed(){
+  println(mouseX + " : " + mouseY);
+}

@@ -26,10 +26,14 @@ public class SideController{
     for(int i=0; i<F.size(); i++){
       int index = F.get(i);
       int ti = 0;
-      if(D.getCentroidX(index) < boundary) ti = 0;
+      float posX = D.getCentroidX(index);
+      float posY = D.getA()[index].y;
+      if(posX < boundary) ti = 0;
       else ti = 1;
       sides[ti].tower_num ++;
       sides[ti].targetTower = index;
+      sides[ti].centerX = posX;
+      sides[ti].upperY = posY;
     }
     
   }
@@ -61,6 +65,8 @@ public class SideController{
 public class SideCondition{
   int tower_num = 0;
   int targetTower = -1;
+  float centerX = 0;
+  float upperY = 0;
   int fHeight;
   float fAngle;
   float fAngleDensity;
@@ -115,13 +121,13 @@ public class CompeteLogic{
     
     stateID = -1;
     userInput = new CompeteInput(this);
-    UI = new CompeteUI();
+    UI = new CompeteUI(this);
   }
   
   public void main(){
     switch(stateID){
       case -1:
-      println("playing");
+      
       break;
       case 20:
       myRelay.update();
@@ -149,7 +155,7 @@ public class CompeteLogic{
       nextAction = null;
     }
     main();
-    UI.stateID = stateID;
+    
     Timer timer = new Timer();
     timer.schedule(new TimerTask(){
       public void run(){
