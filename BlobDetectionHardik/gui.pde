@@ -493,7 +493,7 @@ public void createGUI(){
    /*
    Text Index: from 100
    */
-   processTexts(new String[]{
+   textengine = processTexts(uiengine,new String[]{
                    "Assets/text/place_both.png", //0
                    "Assets/text/place_continue.png",//1
                    "Assets/text/place_wrong_right.png",
@@ -555,7 +555,7 @@ public void createGUI(){
 }
 
 //helper functions for generating uielements
-int processTexts(String[] sources,float xPos,float yPos,float wwidth,float hheight,float xPos1,float yPos1,float wwidth1,float hheight1,int startID ){
+TextEngine processTexts(UIEngine engine, String[] sources,float xPos,float yPos,float wwidth,float hheight,float xPos1,float yPos1,float wwidth1,float hheight1,int startID ){
   UIImage[] res = new UIImage[(sources.length)*2];
   TextAssociation[] ass = new TextAssociation[sources.length];
   int ID = startID-1;
@@ -572,11 +572,10 @@ int processTexts(String[] sources,float xPos,float yPos,float wwidth,float hheig
     ass[i] = new TextAssociation(i,new int[]{ID-1,ID});
   }
   
-  uiengine.setupUI(res);
+  engine.setupUI(res);
   
-  textengine = new TextEngine(ass,uiengine);
+  return (new TextEngine(ass,engine));
   
-  return ID;
 }
 
 int createTower(String name,String[] content,int ID,float ww1,float hh1,float ww2, float hh2){

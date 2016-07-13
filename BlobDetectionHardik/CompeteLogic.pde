@@ -1,9 +1,12 @@
 public class CompeteConfig{
   int boundary;
   int refreshRate;
+  KinectDisplaySetting TabletSetting,ProjectorSetting;
   public CompeteConfig(){
     boundary = 320;
     refreshRate = 20;
+    TabletSetting = new KinectDisplaySetting(touchscreenWidth, touchscreenHeight, 0.8, 1.0, 0.11,-0.07);
+    ProjectorSetting = new KinectDisplaySetting(projectorWidth, projectorHeight, 0.74, 1.0, 0.12,-0.08);
   }
 }
 
@@ -11,12 +14,12 @@ public class CompeteConfig{
 public class SideController{
   SideCondition[] sides;
   int boundary;
-  int tower_num = -1;
   Detector detector;
+  int loser = -1;
   
   public SideController(int b, Detector D){
     boundary = b;
-    sides = new SideCondition[]{new SideCondition(),new SideCondition()};
+    sides = new SideCondition[]{new SideCondition(leftTowerLeft,leftTowerRight),new SideCondition(rightTowerLeft,rightTowerRight)};
     detector = D;
   }
   
@@ -30,24 +33,30 @@ public class SideController{
       float posY = D.getA()[index].y;
       if(posX < boundary) ti = 0;
       else ti = 1;
-      sides[ti].tower_num ++;
-      sides[ti].targetTower = index;
-      sides[ti].centerX = posX;
-      sides[ti].upperY = posY;
+      sides[ti].updateOnce(index,posX,posY);
+      
     }
     
   }
   
-  public int checkFalling(){
+  public int totalTowerNum(){
+    return (sides[0].tower_num + sides[1].tower_num);
+  }
+  
+  public void checkFalling(){
+    
     for(int i=0; i<sides.length; i++){
-      if(sides[i].tower_num < 1)return i;
+      if(sides[i].tower_num < 1){
+        loser = i;
+        return;
+      }
     }
     for(int i=0; i<sides.length; i++){
       if(sides[i].isFallen(detector)){
-        return i;
+        loser = i;
+        return;
       }
     }
-    return -1;
   }
   
   public void prepareData(){
@@ -57,7 +66,7 @@ public class SideController{
   }
   
   public boolean assureForShaking(){
-    return (sides[0].tower_num ==1 && sides[1].tower_num ==1);
+    return (sides[0].tower_num ==1 && sides[1].tower_num ==1 && sides[1].correctPos && sides[0].correctPos);
   }
   
 }
@@ -71,10 +80,25 @@ public class SideCondition{
   float fAngle;
   float fAngleDensity;
   boolean fallen = false;
+  float leftBound,rightBound;
+  boolean correctPos = false;
   
+  public SideCondition(float lb, float rb){
+    leftBound = lb;
+    rightBound = rb;
+  }
   
   public void clean(){
     tower_num = 0;
+  }
+  
+  public void updateOnce(int i,float c,float u){
+    tower_num ++;
+    targetTower = i;
+    centerX = c;
+    upperY = u;
+    if(leftBound <= centerX && centerX <= rightBound) correctPos = true;
+    else correctPos = false;
   }
   
   public void registerData(Detector detector){
@@ -99,6 +123,7 @@ public class CompeteLogic{
   /*
   definition for different states
   -1: else
+  5: placing
   20: shaking
   21: result
   */
@@ -119,7 +144,7 @@ public class CompeteLogic{
     updateInterval = 1000 / config.refreshRate;
     isPlaying = false;
     
-    stateID = -1;
+    stateID = 5;
     userInput = new CompeteInput(this);
     UI = new CompeteUI(this);
   }
@@ -127,13 +152,28 @@ public class CompeteLogic{
   public void main(){
     switch(stateID){
       case -1:
+      break; 
+    
+      
+      case 5:
+      
+      if(controller.assureForShaking()){
+        UI.engine.turnBtn(new int[]{5},true);
+      }
+      else{
+        UI.engine.turnBtn(new int[]{5},false);
+      }
+      
+      
       
       break;
+      
+      
       case 20:
       myRelay.update();
-      int result = controller.checkFalling();
-      if(result >= 0){
-        println("loser : " + result);
+      controller.checkFalling();
+      if(controller.loser >= 0){
+        println("loser : " + controller.loser);
         myRelay.shut();
         stateID = 21;
       }
@@ -191,7 +231,7 @@ public class CompeteLogic{
   }
 }
 
-public class CompeteInput{
+public class CompeteInput extends PApplet{
   
   CompeteLogic logic;
   
@@ -209,6 +249,11 @@ public class CompeteInput{
         logic.myRelay.begin();
       }
     };
+  }
+  
+  public void shakeBtnClicked(GImageButton source, GEvent event){
+    source.setVisible(false);
+    shake();
   }
 }
 

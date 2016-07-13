@@ -1,6 +1,8 @@
-public class CompeteUI{
+public class CompeteUI {
   UIEngine engine;
   CompeteLogic logic;
+  TextEngine engineText;
+  
   SideManager[] sides;
   public CompeteUI(CompeteLogic some){
     logic = some;
@@ -9,34 +11,61 @@ public class CompeteUI{
     engine = new UIEngine(new UIScreen[]{s1,s2});
     /*
     UIElement IDs:
+    
+    Images:
     0: background
     1: table
+    2: blue pig
+    3: red pig
+    4: gorilla
+    
+    Buttons:
+    5: shake
+    
     */
     UIElement[] lib = new UIElement[] {
       
       new UIImage(new int[]{0,1},0,0,0,1,1,"CompeteMode/elements/background.png"),
       new UIImage(new int[]{0},1,0.2,0.52,0.64,0.6,"CompeteMode/elements/table_with_circles.png"),
       new UIImage(new int[]{1},1,0.2,0.55,0.6,0.5,"CompeteMode/elements/table_with_circles.png"),
+      new UIImage(new int[]{0,1},2,0.05,0.5,0.16,0.4,"CompeteMode/elements/pigblue.png"),
+      new UIImage(new int[]{0,1},3,0.81,0.5,0.16,0.4,"CompeteMode/elements/pigred.png"),
+      new UIImage(new int[]{1},4,0.37,0.24,0.26,0.6,"CompeteMode/elements/gorilla.png"),
       
+      new UIButton(new int[]{0},5,logic.userInput,new String[]{"ui_elements/shake_btn.png"},0.35,0.82,0.3,0.17,"shakeBtnClicked"),
+      new UIButton(new int[]{1},5,logic.userInput,new String[]{"ui_elements/shake_btn.png"},0.55,0.83,0.26,0.14,"shakeBtnClicked"),
     };
-    
     engine.setupUI(lib);
     
-    sides = new SideManager[]{new SideManager(logic.controller.sides[0],true),new SideManager(logic.controller.sides[1],false)};
     
+    
+    
+    sides = new SideManager[]{new SideManager(logic.controller.sides[0],logic,true,logic.config),new SideManager(logic.controller.sides[1],logic,false,logic.config)};
+    
+    
+    engineText = processTexts(engine,new String[]{
+                   
+                   "CompeteMode/text/blue_stayed_up.png", //0
+                   
+                 },0,0,1,0.358,0.1,0.02,0.8,0.28,100);
+    engineText.changeText(0);            
     
   }
   public void render(int screenID){
+    
     commonForAll(screenID);
     int curState = logic.stateID;
     switch(curState){
       default:
       drawSides(screenID);
+      engine.drawConstants(screenID,new int[]{2,3});
     }
     drawKinectImage(screenID);
+    
   }
   private void commonForAll(int screenID){
-    engine.drawConstants(screenID,new int[]{0,1});
+    engine.drawConstants(screenID,new int[]{0,4,1});
+    engineText.drawText(screenID);
   }
   private void drawKinectImage(int screenID){
     if(screenID == 0)drawCon();
@@ -51,26 +80,27 @@ public class CompeteUI{
 }
 
 public class SideManager{
+  CompeteConfig config;
   SideCondition logic;
+  CompeteLogic higherLogic;
   SideDrawer[] sides;
   
   
-  public SideManager(SideCondition l, boolean isLeft){
+  public SideManager(SideCondition l, CompeteLogic hl, boolean isLeft, CompeteConfig c){
     logic = l;
-    
+    config = c;
+    higherLogic = hl;
     SideDrawElement[] lib0 = new SideDrawElement[]{
       new SideDrawElement("CompeteMode/elements/arrowDown.png",-0.03,-0.1,0.06,0.2),
-      new SideDrawElement("CompeteMode/elements/check.png",-0.05,-0.05,0.1,0.1),
+      new SideDrawElement("CompeteMode/elements/check.png",-0.05,-0.2,0.1,0),
+      new SideDrawElement("CompeteMode/elements/cross.png",-0.05,-0.2,0.1,0),
     };
     
-    SideDrawElement[] lib1 = new SideDrawElement[]{
-      new SideDrawElement("CompeteMode/elements/arrowDown.png",-0.03,-0.1,0.06,0.2),
-      new SideDrawElement("CompeteMode/elements/check.png",-0.05,-0.05,0.1,0.1),
-    };
+   
     
     sides = new SideDrawer[]{
          new SideDrawer(tabletDrawDelegate,new PVector(touchscreenWidth,touchscreenHeight),lib0),
-         new SideDrawer(projectorDrawDelegate,new PVector(projectorWidth,projectorHeight),lib1),
+         new SideDrawer(projectorDrawDelegate,new PVector(projectorWidth,projectorHeight),lib0),
     };
    
     if(isLeft){
@@ -86,8 +116,14 @@ public class SideManager{
     if(logic.tower_num == 0){
       sides[screenID].drawSome(0,null);
     }
-    else if(logic.tower_num == 1){
-      sides[screenID].drawSome(1,new PVector(logic.centerX,logic.upperY));
+    else if(higherLogic.controller.totalTowerNum()<3 && logic.tower_num == 1){
+      KinectDisplaySetting setting;
+      int imgIndex;
+      if(screenID == 0) setting = config.TabletSetting;
+      else setting = config.ProjectorSetting;
+      if(logic.correctPos) imgIndex = 1;
+      else imgIndex = 2;
+      sides[screenID].drawSome(imgIndex,new PVector(logic.centerX*setting.scaleX+setting.offsetX,logic.upperY*setting.scaleY+setting.offsetY));
     }
   }
 }
@@ -157,8 +193,9 @@ public class KinectDrawingForCompete implements KinectDrawDelegate{
   public KinectDrawingForCompete(CompeteLogic some){
     kinectDrawer = HarryGlobal.kinectDrawer;
     logic = some;
-    TabletSetting = new KinectDisplaySetting(touchscreenWidth, touchscreenHeight, 0.8, 1.0, 0.11,-0.07);
-    ProjectorSetting = new KinectDisplaySetting(projectorWidth, projectorHeight, 0.74, 1.0, 0.12,-0.08);
+    TabletSetting = logic.config.TabletSetting;
+    ProjectorSetting = logic.config.ProjectorSetting;
+    
   }
   void tablet(){
     pgKinectTablet = kinectDrawer.createGraph(TabletSetting, new CompeteColor(logic));
@@ -189,6 +226,9 @@ public class CompeteColor implements ColorBlob{
     }
     else{
       float center = sumX / count;
+      
+      
+      
       if(center < logic.config.boundary){
         res.fill(51, 102, 255);
         res.stroke(0,0,255);
