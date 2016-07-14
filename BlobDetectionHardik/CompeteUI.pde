@@ -18,9 +18,12 @@ public class CompeteUI {
     2: blue pig
     3: red pig
     4: gorilla
+    9: remove arrows
+   
     
     Buttons:
     5: shake
+    8: continue
     
     Animations:
     6: blue pig
@@ -35,9 +38,13 @@ public class CompeteUI {
       new UIImage(new int[]{0,1},2,0.05,0.5,0.16,0.4,"CompeteMode/elements/pigblue.png"),
       new UIImage(new int[]{0,1},3,0.81,0.5,0.16,0.4,"CompeteMode/elements/pigred.png"),
       new UIImage(new int[]{1},4,0.37,0.24,0.26,0.6,"CompeteMode/elements/gorilla.png"),
+      new UIImage(new int[]{0},9,0.38,0.45,0,0.2,"Assets/images/arrows.png"), 
+      new UIImage(new int[]{1},9,0.38,0.45,0,0.2,"Assets/images/arrows.png"), 
       
       new UIButton(new int[]{0},5,logic.userInput,new String[]{"ui_elements/shake_btn.png"},0.35,0.82,0.3,0.17,"shakeBtnClicked"),
       new UIButton(new int[]{1},5,logic.userInput,new String[]{"ui_elements/shake_btn.png"},0.37,0.83,0.26,0.14,"shakeBtnClicked"),
+      new UIButton(new int[]{0},8,logic.userInput,new String[]{"ui_elements/continue_btn.png"},0.35,0.82,0.3,0.17,"continueBtnClicked"),
+      new UIButton(new int[]{1},8,logic.userInput,new String[]{"ui_elements/continue_btn.png"},0.37,0.83,0.26,0.14,"continueBtnClicked"),
       
       new UIAnimation(new int[]{0,1},6,0.05,0.4,0.24,0.54,"CompeteMode/animation/bluepiganimation_",".png",2,4),
       new UIAnimation(new int[]{0,1},7,0.71,0.4,0.24,0.54,"CompeteMode/animation/pinkpiganimation_",".png",2,4),
@@ -53,6 +60,17 @@ public class CompeteUI {
     engineText = processTexts(engine,new String[]{
                    
                    "CompeteMode/text/blue_stayed_up.png", //0
+                   "CompeteMode/text/pink_stayed_up.png",
+                   "CompeteMode/text/both_stayed_up.png",
+                   "CompeteMode/text/pink_stayed_up.png",
+                   "CompeteMode/text/place_2_towers.png",
+                   "CompeteMode/text/placed_correct_both.png", //5
+                   "CompeteMode/text/placed_left.png",
+                   "CompeteMode/text/placed_right.png",
+                   "CompeteMode/text/wrong_spot.png",
+                   "Assets/text/clear_table.png",
+                   
+                   
                    
                  },0,0,1,0.358,0.1,0.02,0.8,0.28,100);
     engineText.changeText(0);            
@@ -63,6 +81,11 @@ public class CompeteUI {
     commonForAll(screenID);
     int curState = logic.stateID;
     switch(curState){
+      case 1:
+      
+      engine.drawConstants(screenID,new int[]{9});
+      break;
+      
       case 5:
       drawSides(screenID);
       engine.drawConstants(screenID,new int[]{2,3});
@@ -77,7 +100,7 @@ public class CompeteUI {
       
       engine.drawConstants(screenID,new int[]{2,3});
     }
-    drawKinectImage(screenID);
+    if(curState>1)drawKinectImage(screenID);
     
   }
   
@@ -89,7 +112,8 @@ public class CompeteUI {
   }
   
   private void commonForAll(int screenID){
-    engine.drawConstants(screenID,new int[]{0,4,1});
+    if(logic.stateID>1)engine.drawConstants(screenID,new int[]{0,4,1});
+    else engine.drawConstants(screenID,new int[]{0,1});
     engineText.drawText(screenID);
   }
   private void drawKinectImage(int screenID){

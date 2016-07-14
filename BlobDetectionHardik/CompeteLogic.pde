@@ -69,6 +69,20 @@ public class SideController{
     return (sides[0].tower_num ==1 && sides[1].tower_num ==1 && sides[1].correctPos && sides[0].correctPos);
   }
   
+  public void reset(){
+    loser = -1;
+    for(int i=0; i<sides.length; i++){
+      sides[i].fallen = false;
+      sides[i].correctPos = false;
+      sides[i].clean();
+      sides[i].targetTower = -1;
+    }
+  }
+  
+  public boolean correctlyPlaced(int i){
+    return (sides[i].correctPos && sides[i].tower_num == 1);
+  }
+  
 }
 
 public class SideCondition{
@@ -122,7 +136,8 @@ public class CompeteLogic{
   int stateID;
   /*
   definition for different states
-  -1: else
+  0: setup
+  1: remove old towers
   5: placing
   20: shaking
   21: result
@@ -144,30 +159,61 @@ public class CompeteLogic{
     updateInterval = 1000 / config.refreshRate;
     isPlaying = false;
     
-    stateID = 5;
+    
     
     //keep this order of initialization!!
     userInput = new CompeteInput(this);
     UI = new CompeteUI(this);
     userInput.ui = UI.engine;
+    
+    stateID = 0;
+  }
+  
+  private void placingTowers(){
+    int towerCount = controller.totalTowerNum();
+    if(towerCount > 2){
+      UI.engineText.changeText(4);
+    }
+    else if(towerCount < 1){
+      UI.engineText.changeText(4);
+    }
+    else if(controller.assureForShaking()){
+      UI.engineText.changeText(5);
+    }
+    else if(controller.correctlyPlaced(0)){
+      UI.engineText.changeText(6);
+    }
+    else if(controller.correctlyPlaced(1)){
+      UI.engineText.changeText(7);
+    }
+    else UI.engineText.changeText(8);
+    
   }
   
   public void main(){
     switch(stateID){
       case -1:
       break; 
+      
+      case 0:
+      controller.reset();
+      stateID = 1;
+      break;
+      
+      case 1:
+      UI.engineText.changeText(9);
+      if(controller.totalTowerNum() == 0) stateID = 5;
+      break;
     
       
       case 5:
-      
+      placingTowers();
       if(controller.assureForShaking()){
         UI.engine.turnBtn(new int[]{5},true);
       }
       else{
         UI.engine.turnBtn(new int[]{5},false);
       }
-      
-      
       
       break;
       
@@ -178,13 +224,19 @@ public class CompeteLogic{
       if(controller.loser >= 0){
         println("loser : " + controller.loser);
         myRelay.shut();
+        UI.engineText.changeText(1-controller.loser);
         stateID = 21;
       }
       else if(!myRelay.isShaking){
         println("loser : nil");
+        UI.engineText.changeText(2);
         stateID = 21;
       }
       
+      break;
+      
+      case 21:
+      UI.engine.turnBtn(new int[]{8},true);
       break;
     }
   }
@@ -258,6 +310,11 @@ public class CompeteInput extends PApplet{
   public void shakeBtnClicked(GImageButton source, GEvent event){
     if(ui!=null)ui.turnBtn(new int[]{5},false);
     shake();
+  }
+  
+  public void continueBtnClicked(GImageButton source, GEvent event){
+    if(ui!=null)ui.turnBtn(new int[]{8},false);
+    logic.stateID = 0;
   }
 }
 
