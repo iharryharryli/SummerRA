@@ -846,10 +846,10 @@ public void draw()
         rightInd = 0;
       }
               
-      leftFallingHeight = towerFallingHeight(bd,towerIndex.get(leftInd),leftHeight);
-      leftFallingAngle = towerFallingAngle(bd,towerIndex.get(leftInd),leftAngle,leftDensity);
+      leftFallingHeight = towerFallingHeight(bd,towerIndex.get(leftInd),leftHeight,false);
+//      leftFallingAngle = towerFallingAngle(bd,towerIndex.get(leftInd),leftAngle,leftDensity);
        
-//      leftFallingAngle2 = "Standing";
+      leftFallingAngle = "Standing";
 //      leftFallingDensity = "Standing";
          
       leftFalling = towerFallingFinalDecision(leftFallingHeight, leftFallingAngle);
@@ -859,10 +859,10 @@ public void draw()
       println("left curr: " + bd.getBlobHeight(towerIndex.get(leftInd)));
       debugScreen.text(leftFalling,bd.getA()[towerIndex.get(leftInd)].x-50,40);
       
-      rightFallingHeight = towerFallingHeight(bd,towerIndex.get(rightInd),rightHeight);
-      rightFallingAngle = towerFallingAngle(bd,towerIndex.get(rightInd),rightAngle,rightDensity);
+      rightFallingHeight = towerFallingHeight(bd,towerIndex.get(rightInd),rightHeight,false);
+//      rightFallingAngle = towerFallingAngle(bd,towerIndex.get(rightInd),rightAngle,rightDensity);
       
-//      rightFallingAngle2 = "Standing";
+      rightFallingAngle = "Standing";
 //      rightFallingDensity = "Standing";
       
       rightFalling = towerFallingFinalDecision(rightFallingHeight, rightFallingAngle);

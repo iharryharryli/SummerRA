@@ -145,8 +145,11 @@ public class CompeteLogic{
     isPlaying = false;
     
     stateID = 5;
+    
+    //keep this order of initialization!!
     userInput = new CompeteInput(this);
     UI = new CompeteUI(this);
+    userInput.ui = UI.engine;
   }
   
   public void main(){
@@ -234,6 +237,7 @@ public class CompeteLogic{
 public class CompeteInput extends PApplet{
   
   CompeteLogic logic;
+  UIEngine ui;
   
   public CompeteInput(CompeteLogic l){
     logic = l;
@@ -252,7 +256,7 @@ public class CompeteInput extends PApplet{
   }
   
   public void shakeBtnClicked(GImageButton source, GEvent event){
-    source.setVisible(false);
+    if(ui!=null)ui.turnBtn(new int[]{5},false);
     shake();
   }
 }

@@ -5,7 +5,7 @@ public class CompeteUI {
   
   SideManager[] sides;
   public CompeteUI(CompeteLogic some){
-    logic = some;
+    logic = some; 
     UIScreen s1 = new UIScreen(tabletDrawDelegate,new PVector(touchscreenWidth,touchscreenHeight),"AssetsTablet/");
     UIScreen s2 = new UIScreen(projectorDrawDelegate,new PVector(projectorWidth,projectorHeight),"AssetsProjector/");
     engine = new UIEngine(new UIScreen[]{s1,s2});
@@ -22,6 +22,10 @@ public class CompeteUI {
     Buttons:
     5: shake
     
+    Animations:
+    6: blue pig
+    7: pink pig
+    
     */
     UIElement[] lib = new UIElement[] {
       
@@ -33,7 +37,10 @@ public class CompeteUI {
       new UIImage(new int[]{1},4,0.37,0.24,0.26,0.6,"CompeteMode/elements/gorilla.png"),
       
       new UIButton(new int[]{0},5,logic.userInput,new String[]{"ui_elements/shake_btn.png"},0.35,0.82,0.3,0.17,"shakeBtnClicked"),
-      new UIButton(new int[]{1},5,logic.userInput,new String[]{"ui_elements/shake_btn.png"},0.55,0.83,0.26,0.14,"shakeBtnClicked"),
+      new UIButton(new int[]{1},5,logic.userInput,new String[]{"ui_elements/shake_btn.png"},0.37,0.83,0.26,0.14,"shakeBtnClicked"),
+      
+      new UIAnimation(new int[]{0,1},6,0.05,0.4,0.24,0.54,"CompeteMode/animation/bluepiganimation_",".png",2,4),
+      new UIAnimation(new int[]{0,1},7,0.71,0.4,0.24,0.54,"CompeteMode/animation/pinkpiganimation_",".png",2,4),
     };
     engine.setupUI(lib);
     
@@ -56,13 +63,31 @@ public class CompeteUI {
     commonForAll(screenID);
     int curState = logic.stateID;
     switch(curState){
-      default:
+      case 5:
       drawSides(screenID);
+      engine.drawConstants(screenID,new int[]{2,3});
+      break;
+      case 20:
+      engine.drawConstants(screenID,new int[]{2,3});
+      break;
+      case 21:
+      jumpingPigs(screenID);
+      break;
+      default:
+      
       engine.drawConstants(screenID,new int[]{2,3});
     }
     drawKinectImage(screenID);
     
   }
+  
+  private void jumpingPigs(int screenID){
+    if(logic.controller.loser == 0)engine.drawConstants(screenID,new int[]{2});
+    else engine.drawConstants(screenID,new int[]{6});
+    if(logic.controller.loser == 1)engine.drawConstants(screenID,new int[]{3});
+    else engine.drawConstants(screenID,new int[]{7});
+  }
+  
   private void commonForAll(int screenID){
     engine.drawConstants(screenID,new int[]{0,4,1});
     engineText.drawText(screenID);
@@ -190,25 +215,58 @@ public class KinectDrawingForCompete implements KinectDrawDelegate{
   DrawKinect kinectDrawer;
   CompeteLogic logic;
   KinectDisplaySetting TabletSetting,ProjectorSetting;
+  ArrayList<Float> buffer;
+  int onlyGreen = 999;
   public KinectDrawingForCompete(CompeteLogic some){
     kinectDrawer = HarryGlobal.kinectDrawer;
     logic = some;
     TabletSetting = logic.config.TabletSetting;
     ProjectorSetting = logic.config.ProjectorSetting;
-    
+    buffer = new ArrayList<Float>();
   }
   void tablet(){
-    pgKinectTablet = kinectDrawer.createGraph(TabletSetting, new CompeteColor(logic));
+    
+    if(logic.controller.loser >= 0) onlyGreen = analyzeForResult();
+    pgKinectTablet = kinectDrawer.createGraph(TabletSetting, new CompeteColor(logic,onlyGreen));
   }
   void projector(){
-    pgKinectProjector = kinectDrawer.createGraph(ProjectorSetting, new CompeteColor(logic));
+    pgKinectProjector = kinectDrawer.createGraph(ProjectorSetting, new CompeteColor(logic,onlyGreen));
+  }
+  
+  private int analyzeForResult(){
+    buffer.clear();
+    for (int i=0; i<kinectDrawer.kinectContours.size(); i++){
+      int altitudeThreshold = HarryGlobal.groundThreshold;
+      float locallowY = 0;
+      float sumX = 0;
+      int count = 0;
+      for (PVector point : kinectDrawer.kinectContours.get(i).getPoints()){
+        if(point.y>locallowY)locallowY=point.y;
+        sumX += point.x;
+        count++;
+      }
+      if(locallowY>altitudeThreshold){
+        float center = sumX / count;
+        buffer.add(center);
+      }
+    }
+    int leftmost = 0, rightmost = 0;
+    for(int i=1; i<buffer.size(); i++){
+      if(buffer.get(i)<buffer.get(leftmost))leftmost = i;
+      if(buffer.get(i)>buffer.get(rightmost))rightmost = i;
+    }
+    if(logic.controller.loser == 0)return rightmost;
+    return leftmost;
   }
 }
 
 public class CompeteColor implements ColorBlob{
+  int towerDrawn = -1;
   CompeteLogic logic;
-  public CompeteColor(CompeteLogic some){
+  int onlygreen;
+  public CompeteColor(CompeteLogic some, int green){
     logic = some;
+    onlygreen = green;
   }
   void coloring(PGraphics res, Contour info){
     int altitudeThreshold = HarryGlobal.groundThreshold;
@@ -225,18 +283,37 @@ public class CompeteColor implements ColorBlob{
          res.stroke(100);
     }
     else{
-      float center = sumX / count;
-      
-      
-      
-      if(center < logic.config.boundary){
-        res.fill(51, 102, 255);
-        res.stroke(0,0,255);
+      towerDrawn ++;
+      if(logic.stateID < 20){
+        float center = sumX / count;
+        if(center < logic.config.boundary){
+          res.fill(51, 102, 255);
+          res.stroke(0,0,255);
+        }
+        else{
+          res.fill(252, 24, 221);
+          res.stroke(255,0,171);
+        }
       }
       else{
-        res.fill(252, 24, 221);
-        res.stroke(255,0,171);
+
+          if(logic.controller.loser < 0){
+            res.fill(140, 255, 140);   
+            res.stroke(0, 200, 0);
+          }
+          else {
+            if(towerDrawn == onlygreen){
+              res.fill(140, 255, 140);   
+              res.stroke(0, 200, 0);
+            }
+            else{
+              res.fill(255, 140, 140);
+              res.stroke(255, 0, 0);
+            }
+          }
+
       }
+    
     }
   }
 }

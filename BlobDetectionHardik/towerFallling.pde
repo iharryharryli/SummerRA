@@ -19,11 +19,14 @@ String towerFallingFinalDecision(String heightResult, String angle1Result){
 
 // This function checks whether the tower have fallen or not  
 
-String towerFallingHeight(Detector Blobs, int blobNumber,int blobHeight){
+String towerFallingHeight(Detector Blobs, int blobNumber,int blobHeight, boolean playGameModeOn){
   // blobNum is the array which is return from the function getNum_getIndex
   // Blobs is the BlobObject containing all the blobs and other information
   
-  int heightThreshold = 25;
+  int heightThreshold;
+  if (playGameModeOn) heightThreshold = 8;
+  else heightThreshold = 25;
+  
   
   float heightDiff = abs(Blobs.getBlobHeight(blobNumber) - blobHeight);
   

@@ -301,7 +301,7 @@ class ChallengeLogic{
       }
      
       
-      leftFallingHeight = towerFallingHeight(bd,towerIndex.get(0),leftHeight);
+      leftFallingHeight = towerFallingHeight(bd,towerIndex.get(0),leftHeight,true);
       leftFallingAngle = towerFallingAngle(bd,towerIndex.get(0),leftAngle,leftDensity);
       //leftFallingMoI = towerFallingMoI(bd,towerIndex.get(0),leftMoIx,leftMoIy); // for later use
       //println(leftFallingMoI);

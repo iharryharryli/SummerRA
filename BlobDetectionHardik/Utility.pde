@@ -28,7 +28,7 @@ public class RelayControl{
 }
 
 public boolean judgeFalling(Detector D,int index,int h,float a,float ad){
-  String lleftFallingHeight = towerFallingHeight(D,index,h);
+  String lleftFallingHeight = towerFallingHeight(D,index,h,false);
   String lleftFallingAngle = towerFallingAngle(D,index,a,ad);
   
   String lleftFalling = towerFallingFinalDecision(lleftFallingHeight, lleftFallingAngle);
