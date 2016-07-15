@@ -104,13 +104,15 @@ public class SideCondition{
   
   public void clean(){
     tower_num = 0;
+    centerX = 0;
+    upperY = 99999;
   }
   
   public void updateOnce(int i,float c,float u){
     tower_num ++;
     targetTower = i;
-    centerX = c;
-    upperY = u;
+    centerX = ((tower_num - 1)*centerX + c)/(tower_num);
+    if(u<upperY)upperY = u;
     if(leftBound <= centerX && centerX <= rightBound) correctPos = true;
     else correctPos = false;
   }
@@ -264,6 +266,8 @@ public class CompeteLogic{
       }
     },updateInterval);
   }
+  
+  
   public void startPlaying(){
     HarryGlobal.kinectDrawDelegate = null;
     HarryGlobal.kinectDrawDelegate = new KinectDrawingForCompete(this);
@@ -271,6 +275,14 @@ public class CompeteLogic{
     isPlaying = true;
     play();
   }
+  
+  public void stopPlaying(){
+    UI.engine.switchOn(new int[]{});
+    isPlaying = false;
+    HarryGlobal.kinectDrawDelegate = null;
+  }
+  
+  
   public void detection(){
     
     detector = getBlobScannerObject(detector,srcImage);

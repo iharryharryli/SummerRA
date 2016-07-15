@@ -36,7 +36,7 @@ public class CompeteUI {
       new UIImage(new int[]{0},1,0.2,0.52,0.64,0.6,"CompeteMode/elements/table_with_circles.png"),
       new UIImage(new int[]{1},1,0.2,0.55,0.6,0.5,"CompeteMode/elements/table_with_circles.png"),
       new UIImage(new int[]{0,1},2,0.05,0.5,0.16,0.4,"CompeteMode/elements/pigblue.png"),
-      new UIImage(new int[]{0,1},3,0.81,0.5,0.16,0.4,"CompeteMode/elements/pigred.png"),
+      new UIImage(new int[]{0,1},3,0.79,0.5,0.16,0.4,"CompeteMode/elements/pigred.png"),
       new UIImage(new int[]{1},4,0.37,0.24,0.26,0.6,"CompeteMode/elements/gorilla.png"),
       new UIImage(new int[]{0},9,0.38,0.45,0,0.2,"Assets/images/arrows.png"), 
       new UIImage(new int[]{1},9,0.38,0.45,0,0.2,"Assets/images/arrows.png"), 
@@ -46,8 +46,14 @@ public class CompeteUI {
       new UIButton(new int[]{0},8,logic.userInput,new String[]{"ui_elements/continue_btn.png"},0.35,0.82,0.3,0.17,"continueBtnClicked"),
       new UIButton(new int[]{1},8,logic.userInput,new String[]{"ui_elements/continue_btn.png"},0.37,0.83,0.26,0.14,"continueBtnClicked"),
       
-      new UIAnimation(new int[]{0,1},6,0.05,0.4,0.24,0.54,"CompeteMode/animation/bluepiganimation_",".png",2,4),
-      new UIAnimation(new int[]{0,1},7,0.71,0.4,0.24,0.54,"CompeteMode/animation/pinkpiganimation_",".png",2,4),
+//      new UIAnimation(new int[]{0,1},6,0.05,0.4,0.24,0.54,"CompeteMode/animation/bluepiganimation_",".png",2,4),
+//      new UIAnimation(new int[]{0,1},7,0.71,0.4,0.24,0.54,"CompeteMode/animation/pinkpiganimation_",".png",2,4),
+      
+      new UIAnimation(new int[]{0,1},6,0.05,0.5,0.16,0.4,"CompeteMode/animation/bluepiganimation_",".png",2,4),
+      new UIAnimation(new int[]{0,1},7,0.79,0.5,0.16,0.4,"CompeteMode/animation/pinkpiganimation_",".png",2,4),
+      
+      new UIImage(new int[]{0},31,0.32,0.27,0,0.5,"ChallengeMode/only_one_tower.png"), 
+      new UIImage(new int[]{1},31,0.32,0.23,0,0.5,"ChallengeMode/only_one_tower.png"),
     };
     engine.setupUI(lib);
     
@@ -88,6 +94,7 @@ public class CompeteUI {
       case 5:
       drawSides(screenID);
       engine.drawConstants(screenID,new int[]{2,3});
+      if(logic.controller.totalTowerNum() > 2)engine.drawConstants(screenID,new int[]{31});
       break;
       case 20:
       engine.drawConstants(screenID,new int[]{2,3});
@@ -100,7 +107,7 @@ public class CompeteUI {
       engine.drawConstants(screenID,new int[]{2,3});
     }
     if(curState>1)drawKinectImage(screenID);
-    
+    if(curState == 5 && logic.controller.totalTowerNum() > 2)engine.drawConstants(screenID,new int[]{31});
   }
   
   private void jumpingPigs(int screenID){
@@ -161,10 +168,10 @@ public class SideManager{
     }
   }
   public void drawSideOn(int screenID){
-    if(logic.tower_num == 0){
+    if(logic.tower_num == 0 || !logic.correctPos){
       sides[screenID].drawSome(0,null);
     }
-    else if(higherLogic.controller.totalTowerNum()<3 && logic.tower_num == 1){
+    if(higherLogic.controller.totalTowerNum()<3 && logic.tower_num == 1){
       KinectDisplaySetting setting;
       int imgIndex;
       if(screenID == 0) setting = config.TabletSetting;
@@ -172,6 +179,12 @@ public class SideManager{
       if(logic.correctPos) imgIndex = 1;
       else imgIndex = 2;
       sides[screenID].drawSome(imgIndex,new PVector(logic.centerX*setting.scaleX+setting.offsetX,logic.upperY*setting.scaleY+setting.offsetY));
+    }
+    else if(logic.tower_num == 2){
+      KinectDisplaySetting setting;
+      if(screenID == 0) setting = config.TabletSetting;
+      else setting = config.ProjectorSetting;
+      sides[screenID].drawSome(2,new PVector(logic.centerX*setting.scaleX+setting.offsetX,logic.upperY*setting.scaleY+setting.offsetY));
     }
   }
 }

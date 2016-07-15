@@ -121,7 +121,8 @@ public void projectorDrawTowers(PApplet appc)
 
 
 public void setupHomeScene(){
-  uiengine.switchOn(new int[]{1,2});
+  
+  uiengine.switchOn(new int[]{40,41,42});
 }
   
 
