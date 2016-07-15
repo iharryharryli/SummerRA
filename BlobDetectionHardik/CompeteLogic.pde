@@ -195,14 +195,16 @@ public class CompeteLogic{
       case -1:
       break; 
       
+      
+      
       case 0:
-      controller.reset();
-      stateID = 1;
+      UI.engineText.changeText(9);
+      if(controller.totalTowerNum() == 0) stateID = 1;
       break;
       
       case 1:
-      UI.engineText.changeText(9);
-      if(controller.totalTowerNum() == 0) stateID = 5;
+      controller.reset();
+      stateID = 5;
       break;
     
       
@@ -236,7 +238,11 @@ public class CompeteLogic{
       break;
       
       case 21:
-      UI.engine.turnBtn(new int[]{8},true);
+      if(controller.totalTowerNum() == 0){
+        UI.engine.turnBtn(new int[]{8},false);
+        stateID = 1;
+      }
+      else UI.engine.turnBtn(new int[]{8},true);
       break;
     }
   }

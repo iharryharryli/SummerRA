@@ -81,8 +81,7 @@ public class CompeteUI {
     commonForAll(screenID);
     int curState = logic.stateID;
     switch(curState){
-      case 1:
-      
+      case 0:
       engine.drawConstants(screenID,new int[]{9});
       break;
       
