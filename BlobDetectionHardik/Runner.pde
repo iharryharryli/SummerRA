@@ -219,7 +219,7 @@ public void setup(){
   
   
   challengelogic = new ChallengeLogic();
-  if(COMPETE_MODE_ON)competelogic = new CompeteLogic();
+  competelogic = new CompeteLogic();
   //competelogic.startPlaying();
   
   frameRate(25);
@@ -844,7 +844,7 @@ public void draw()
         rightInd = 0;
       }
               
-      leftFallingHeight = towerFallingHeight(bd,towerIndex.get(leftInd),leftHeight,false);
+      leftFallingHeight = towerFallingHeight(bd,towerIndex.get(leftInd),leftHeight,true);
 //      leftFallingAngle = towerFallingAngle(bd,towerIndex.get(leftInd),leftAngle,leftDensity);
        
       leftFallingAngle = "Standing";
@@ -857,7 +857,7 @@ public void draw()
       println("left curr: " + bd.getBlobHeight(towerIndex.get(leftInd)));
       debugScreen.text(leftFalling,bd.getA()[towerIndex.get(leftInd)].x-50,40);
       
-      rightFallingHeight = towerFallingHeight(bd,towerIndex.get(rightInd),rightHeight,false);
+      rightFallingHeight = towerFallingHeight(bd,towerIndex.get(rightInd),rightHeight,true);
 //      rightFallingAngle = towerFallingAngle(bd,towerIndex.get(rightInd),rightAngle,rightDensity);
       
       rightFallingAngle = "Standing";

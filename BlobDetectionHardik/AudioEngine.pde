@@ -42,7 +42,8 @@ public class AudioEngine{
     
             String file = (String)search.get(i);
             
-            player = null;
+            if(player!=null)player.pause();
+            
             
             player = minim.loadFile(file, 2048);
             

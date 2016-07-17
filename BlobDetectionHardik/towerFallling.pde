@@ -4,8 +4,6 @@ String towerFallingFinalDecision(String heightResult, String angle1Result){
   
   println("\nleft falling height: " + heightResult);
   println("left falling angle: " + angle1Result);
-
-//  heightResult = "Standing";
   
   if (angle1Result.equals("Fallen") || heightResult.equals("Fallen")){
     finalDecision = "Fallen";
@@ -32,7 +30,6 @@ String towerFallingHeight(Detector Blobs, int blobNumber,int blobHeight, boolean
   
   println("Height Diff: " + heightDiff);
   
-//  if ((Blobs.getBlobHeight(blobNumber)) < blobHeight - 8){
   if(heightDiff > heightThreshold){
     return "Fallen";
   } else {

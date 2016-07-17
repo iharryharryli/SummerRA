@@ -104,6 +104,8 @@ class ChallengeLogic{
  
   private long shakeDelay = -1;
   
+  private long noTowerContinueTimeout = -1;
+  
   int trials;
   
   int challengeReceived;
@@ -113,6 +115,8 @@ class ChallengeLogic{
   boolean success;
   
   boolean noRuler;
+  
+  
   
   ChallengeLogic(){
    
@@ -133,6 +137,7 @@ class ChallengeLogic{
   }
   
   void switchIn(){
+    
     cs = ChallengeMyTowerState.INITIAL;
     rulerEngine.turnRulers(false);
     rulerEngine.changeRulerShape(-1);
@@ -188,7 +193,8 @@ class ChallengeLogic{
  }
  
  private void resultCommon(){
-   if(towers.size() == 0)control.continueBtnClick();
+   if(noTowerContinueTimeout < 0 && towers.size() == 0) noTowerContinueTimeout = System.currentTimeMillis() + 4000;
+   else if(noTowerContinueTimeout>0 && System.currentTimeMillis() > noTowerContinueTimeout) control.continueBtnClick();
  }
    
  void play(){
@@ -262,7 +268,7 @@ class ChallengeLogic{
       break;
       
       case SHAKING:
-      
+      noTowerContinueTimeout = -1;
       HarryGlobal.canRegisterHeight = false;
       
       indicateTowerState(rulerEngine,-1);

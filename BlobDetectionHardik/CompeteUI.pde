@@ -52,8 +52,8 @@ public class CompeteUI {
       new UIAnimation(new int[]{0,1},6,0.05,0.5,0.16,0.4,"CompeteMode/animation/bluepiganimation_",".png",2,4),
       new UIAnimation(new int[]{0,1},7,0.79,0.5,0.16,0.4,"CompeteMode/animation/pinkpiganimation_",".png",2,4),
       
-      new UIImage(new int[]{0},31,0.32,0.27,0,0.5,"ChallengeMode/only_one_tower.png"), 
-      new UIImage(new int[]{1},31,0.32,0.23,0,0.5,"ChallengeMode/only_one_tower.png"),
+      new UIImage(new int[]{0},31,0.32,0.27,0,0.5,"CompeteMode/elements/only_two_towers.png"), 
+      new UIImage(new int[]{1},31,0.32,0.23,0,0.5,"CompeteMode/elements/only_two_towers.png"),
     };
     engine.setupUI(lib);
     
@@ -171,20 +171,22 @@ public class SideManager{
     if(logic.tower_num == 0 || !logic.correctPos){
       sides[screenID].drawSome(0,null);
     }
-    if(higherLogic.controller.totalTowerNum()<3 && logic.tower_num == 1){
-      KinectDisplaySetting setting;
-      int imgIndex;
-      if(screenID == 0) setting = config.TabletSetting;
-      else setting = config.ProjectorSetting;
-      if(logic.correctPos) imgIndex = 1;
-      else imgIndex = 2;
-      sides[screenID].drawSome(imgIndex,new PVector(logic.centerX*setting.scaleX+setting.offsetX,logic.upperY*setting.scaleY+setting.offsetY));
-    }
-    else if(logic.tower_num == 2){
-      KinectDisplaySetting setting;
-      if(screenID == 0) setting = config.TabletSetting;
-      else setting = config.ProjectorSetting;
-      sides[screenID].drawSome(2,new PVector(logic.centerX*setting.scaleX+setting.offsetX,logic.upperY*setting.scaleY+setting.offsetY));
+    if(higherLogic.controller.totalTowerNum()<3){
+      if(logic.tower_num == 1){
+        KinectDisplaySetting setting;
+        int imgIndex;
+        if(screenID == 0) setting = config.TabletSetting;
+        else setting = config.ProjectorSetting;
+        if(logic.correctPos) imgIndex = 1;
+        else imgIndex = 2;
+        sides[screenID].drawSome(imgIndex,new PVector(logic.centerX*setting.scaleX+setting.offsetX,logic.upperY*setting.scaleY+setting.offsetY));
+      }
+      else if(logic.tower_num == 2){
+        KinectDisplaySetting setting;
+        if(screenID == 0) setting = config.TabletSetting;
+        else setting = config.ProjectorSetting;
+        sides[screenID].drawSome(2,new PVector(logic.centerX*setting.scaleX+setting.offsetX,logic.upperY*setting.scaleY+setting.offsetY));
+      }
     }
   }
 }

@@ -153,6 +153,8 @@ public class CompeteLogic{
   RelayControl myRelay;
   CompeteInput userInput;
   CompeteUI UI;
+  AudioEngine audio;
+  boolean instructionPlayed = false;
  
   public CompeteLogic(){
     detector = bd;
@@ -167,28 +169,48 @@ public class CompeteLogic{
     userInput = new CompeteInput(this);
     UI = new CompeteUI(this);
     userInput.ui = UI.engine;
-    
+    setupAudio();
     stateID = 0;
+  }
+  
+  private void setupAudio(){
+    audio = new AudioEngine();
+    audio.addToEngine(new Object[]{
+      0,"CompeteMode/audio/place_towers.wav",
+      1,"CompeteMode/audio/placed_left.wav",
+      2,"CompeteMode/audio/placed_right.wav",
+      3,"CompeteMode/audio/wrong_spot.wav",
+      4,"CompeteMode/audio/placed_both.wav",
+      5,"CompeteMode/audio/blue_won.wav",
+      6,"CompeteMode/audio/pink_won.wav",
+      7,"CompeteMode/audio/both_stayed_up.wav",
+      8,"Assets/audio/clear_table.wav",
+
+    });
   }
   
   private void placingTowers(){
     int towerCount = controller.totalTowerNum();
-    if(towerCount > 2){
+    if(towerCount < 1){
       UI.engineText.changeText(4);
-    }
-    else if(towerCount < 1){
-      UI.engineText.changeText(4);
+      if(!instructionPlayed)audio.playOnce(0);
     }
     else if(controller.assureForShaking()){
       UI.engineText.changeText(5);
+      audio.playOnce(4);
     }
     else if(controller.correctlyPlaced(0)){
       UI.engineText.changeText(6);
+       audio.playOnce(1);
     }
     else if(controller.correctlyPlaced(1)){
       UI.engineText.changeText(7);
+       audio.playOnce(2);
     }
-    else UI.engineText.changeText(8);
+    else {
+      UI.engineText.changeText(8);
+       audio.playOnce(3);
+    }
     
   }
   
@@ -202,15 +224,18 @@ public class CompeteLogic{
       case 0:
       UI.engineText.changeText(9);
       if(controller.totalTowerNum() == 0) stateID = 1;
+      audio.playOnce(8);
       break;
       
       case 1:
+      instructionPlayed = false;
       controller.reset();
       stateID = 5;
       break;
     
       
       case 5:
+      
       placingTowers();
       if(controller.assureForShaking()){
         UI.engine.turnBtn(new int[]{5},true);
@@ -229,12 +254,14 @@ public class CompeteLogic{
         println("loser : " + controller.loser);
         myRelay.shut();
         UI.engineText.changeText(1-controller.loser);
+        audio.playOnce(6-controller.loser);
         stateID = 21;
       }
       else if(!myRelay.isShaking){
         println("loser : nil");
         UI.engineText.changeText(2);
         stateID = 21;
+        audio.playOnce(7);
       }
       
       break;
@@ -269,6 +296,7 @@ public class CompeteLogic{
   
   
   public void startPlaying(){
+    audio.cleanUp();
     HarryGlobal.kinectDrawDelegate = null;
     HarryGlobal.kinectDrawDelegate = new KinectDrawingForCompete(this);
     gs = GameState.COMPETE;
@@ -280,6 +308,7 @@ public class CompeteLogic{
     UI.engine.switchOn(new int[]{});
     isPlaying = false;
     HarryGlobal.kinectDrawDelegate = null;
+    audio.shutUp();
   }
   
   
@@ -321,6 +350,7 @@ public class CompeteInput extends PApplet{
         logic.stateID = 20;
         logic.myRelay = new RelayControl(5000);
         logic.myRelay.begin();
+        logic.audio.shutUp();
       }
     };
   }
